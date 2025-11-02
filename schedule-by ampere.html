@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hololive 配信スケジュール</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #00B7EB, #FFFFFF);
+            --card-bg: #FFF;
+            --text: #333;
+            --header-bg: #0288D1;
+            --live: #FF0000;
+            --upcoming: #00B7EB;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --border: #00B7EB;
+            --announce: #FF6D00;
+            --check-bg: #4CAF50;
+            --unchecked-bg: #F44336;
+            --clock-bg: rgba(255, 255, 255, 0.95);
+            --clock-text: #0288D1;
+            --favorite-bg: #FFD700;
+            --favorite-border: #FFA000;
+            --favorite-card-border: #FFC107;
+            --notif-bg: #323232;
+            --notif-text: #FFF;
+            --notif-border: #444;
+        }
+        [data-theme="dark"] {
+            --bg-gradient: linear-gradient(135deg, #0D47A1, #1A1A1A);
+            --card-bg: #1E1E1E;
+            --text: #EEE;
+            --header-bg: #1565C0;
+            --live: #E53935;
+            --upcoming: #1E88E5;
+            --shadow: rgba(0, 0, 0, 0.5);
+            --border: #42A5F5;
+            --announce: #FF8A65;
+            --check-bg: #66BB6A;
+            --unchecked-bg: #E57373;
+            --clock-bg: rgba(30, 30, 30, 0.95);
+            --clock-text: #42A5F5;
+            --favorite-bg: #FFB300;
+            --favorite-border: #FF8F00;
+            --favorite-card-border: #FFB300;
+            --notif-bg: #2A2A2A;
+            --notif-text: #EEE;
+            --notif-border: #555;
+        }
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background: var(--bg-gradient);
+            margin: 0;
+            padding: 20px;
+            color: var(--text);
+            transition: background 0.5s;
+            position: relative;
+        }
+        .clock {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--clock-bg);
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px var(--shadow);
+            font-size: 1em;
+            font-weight: bold;
+            color: var(--clock-text);
+            z-index: 1000;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px var(--shadow);
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        [data-theme="dark"] .container {
+            background: rgba(30, 30, 30, 0.98);
+        }
+        h1 {
+            text-align: center;
+            color: var(--header-bg);
+            font-size: 2.2em;
+            margin: 0 0 20px;
+            text-shadow: 0 2px 4px var(--shadow);
+        }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+        .api-key-input {
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            width: 250px;
+            font-size: 0.9em;
+            background: var(--card-bg);
+            color: var(--text);
+        }
+        button {
+            padding: 8px 16px;
+            background: var(--header-bg);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #0277BD;
+        }
+        .tab-button {
+            background: #E0E0E0;
+            color: #333;
+        }
+        .tab-button.active {
+            background: var(--header-bg);
+            color: white;
+        }
+        [data-theme="dark"] .tab-button {
+            background: #333;
+            color: #EEE;
+        }
+        [data-theme="dark"] .tab-button.active {
+            background: var(--header-bg);
+        }
+        .filter-announce { background: var(--announce) !important; }
+        .filter-announce.active { background: #E65100 !important; }
+        .filter-checked { background: var(--check-bg) !important; }
+        .filter-checked.active { background: #388E3C !important; }
+        .filter-favorite { background: var(--favorite-bg) !important; color: #000 !important; }
+        .filter-favorite.active { background: #FFC107 !important; }
+        .filter-old { background: #9C27B0 !important; color: white !important; }
+        .filter-old.active { background: #7B1FA2 !important; }
+        [data-theme="dark"] .filter-old { background: #7B1FA2 !important; }
+        [data-theme="dark"] .filter-old.active { background: #4A148C !important; }
+
+        .clear-all-btn, .clear-fav-btn {
+            background: #9E9E9E !important;
+        }
+        .clear-all-btn:hover, .clear-fav-btn:hover {
+            background: #757575 !important;
+        }
+        [data-theme="dark"] .clear-all-btn, [data-theme="dark"] .clear-fav-btn {
+            background: #555 !important;
+        }
+        [data-theme="dark"] .clear-all-btn:hover, [data-theme="dark"] .clear-fav-btn:hover {
+            background: #666 !important;
+        }
+
+        .time-group {
+            margin-bottom: 20px;
+        }
+        .time-header {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #FFF;
+            background: var(--header-bg);
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .schedule-container {
+            overflow-x: auto;
+            white-space: nowrap;
+            padding-bottom: 10px;
+            scrollbar-width: thin;
+        }
+        .stream-card {
+            display: inline-block;
+            width: 280px;
+            margin-right: 15px;
+            background: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px var(--shadow);
+            transition: transform 0.2s, border 0.2s;
+            vertical-align: top;
+            position: relative;
+            border: 2px solid transparent;
+        }
+        .stream-card.favorite {
+            border-color: var(--favorite-card-border) !important;
+            box-shadow: 0 2px 8px rgba(255, 193, 7, 0.4);
+        }
+        .stream-card:hover {
+            transform: translateY(-3px);
+        }
+        .thumbnail-wrapper {
+            position: relative;
+            display: block;
+        }
+        .thumbnail {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            object-fit: cover;
+            display: block;
+        }
+        .stream-info {
+            padding: 10px;
+            position: relative;
+        }
+        .member-name {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: var(--header-bg);
+            margin: 0 0 5px;
+        }
+        .stream-title {
+            font-size: 0.9em;
+            color: #555;
+            margin: 0 0 5px;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        [data-theme="dark"] .stream-title {
+            color: #CCC;
+        }
+        .status-indicator {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            color: white;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        .live { background: var(--live); }
+        .upcoming { background: var(--upcoming); }
+        .announce { background: var(--announce); }
+
+        .checkbox-overlay {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s;
+            z-index: 10;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        [data-theme="dark"] .checkbox-overlay {
+            background: rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+        .checkbox-overlay.checked {
+            background: var(--check-bg);
+            border-color: var(--check-bg);
+        }
+
+        .favorite-overlay {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.4);
+            border: 2px solid var(--favorite-border);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: transparent;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        [data-theme="dark"] .favorite-overlay {
+            background: rgba(0, 0, 0, 0.4);
+        }
+        .favorite-overlay.favorited {
+            background: var(--favorite-bg);
+            color: #FFFFFF !important;
+            font-weight: bold;
+        }
+        .favorite-overlay::before {
+            content: '★';
+        }
+
+        .loading, .error, .no-streams {
+            text-align: center;
+            color: #777;
+            padding: 20px;
+        }
+        .error { color: #E53935; }
+        a { text-decoration: none; }
+        .auto-refresh {
+            font-size: 0.8em;
+            color: #666;
+        }
+        [data-theme="dark"] .auto-refresh { color: #AAA; }
+        .info {
+            font-size: 0.8em;
+            color: #D32F2F;
+            background: #FFEBEE;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        [data-theme="dark"] .info {
+            background: #440000;
+            color: #FF8A80;
+        }
+
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            align-items: flex-end;
+        }
+        .toast {
+            background: var(--notif-bg);
+            color: var(--notif-text);
+            padding: 12px 16px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            min-width: 280px;
+            max-width: 380px;
+            border-left: 4px solid var(--upcoming);
+            animation: slideIn 0.3s ease-out;
+            position: relative;
+            opacity: 1;
+            transition: all 0.3s;
+        }
+        .toast.start { border-left-color: var(--live); }
+        .toast.fade-out {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+        .toast .close {
+            position: absolute;
+            top: 6px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: #AAA;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        .toast .title {
+            font-weight: bold;
+            margin-bottom: 4px;
+            font-size: 0.95em;
+        }
+        .toast .content {
+            font-size: 0.85em;
+            line-height: 1.3;
+            word-break: break-word;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(120%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="clock" id="jstClock">JST: 取得中...</div>
+
+    <div class="container">
+        <h1>Hololive 配信スケジュール</h1>
+        
+        <div class="info">
+            APIキーは <strong>必須</strong> です！
+            <a href="https://holodex.net/" target="_blank" style="color:#D32F2F;">holodex.net</a> でログイン → API Key をコピー → 入力 → 「保存」
+        </div>
+
+        <div class="controls">
+            <input type="password" id="apiKey" class="api-key-input" placeholder="APIキーを入力（必須）">
+            <button onclick="saveApiKey()">保存</button>
+            <button onclick="loadSchedule()">手動更新</button>
+            <button onclick="toggleTheme()" id="themeBtn">ダークモード</button>
+            <span class="auto-refresh">自動更新: <span id="timer">5:00</span></span>
+        </div>
+
+        <div class="controls">
+            <button class="tab-button active" data-mode="all">すべて</button>
+            <button class="tab-button filter-announce" data-mode="announce">告知枠のみ</button>
+            <button class="tab-button filter-checked" data-mode="checked">チェック済みのみ</button>
+            <button class="tab-button filter-favorite" id="favoriteFilterBtn">推しのみ OFF</button>
+            <button class="tab-button filter-old" id="oldFilterBtn">2時間経過枠を非表示 OFF</button>
+            <button class="tab-button clear-all-btn" onclick="clearAllChecks()">すべてチェックを外す</button>
+            <button class="tab-button clear-fav-btn" onclick="clearAllFavorites()">すべて推し解除</button>
+        </div>
+
+        <div id="content"></div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        const API_KEY_STORAGE = 'hololive_schedule_apikey';
+        const THEME_STORAGE = 'hololive_schedule_theme';
+        const CHECKED_STORAGE = 'hololive_checked_videos';
+        const FAVORITE_CHANNELS_STORAGE = 'hololive_favorite_channels';
+        let autoRefreshTimer;
+        let countdown = 300;
+        let checkedVideos = new Set(JSON.parse(localStorage.getItem(CHECKED_STORAGE) || '[]'));
+        let favoriteChannels = new Set(JSON.parse(localStorage.getItem(FAVORITE_CHANNELS_STORAGE) || '[]'));
+        let isFavoriteFilterActive = false;
+        let isHideOldFilterActive = false;
+        const notifiedVideos = new Set();
+
+        function updateJSTClock() {
+            const now = new Date();
+            const jst = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Tokyo"}));
+            const year = jst.getFullYear();
+            const month = String(jst.getMonth() + 1).padStart(2, '0');
+            const day = String(jst.getDate()).padStart(2, '0');
+            const hours = String(jst.getHours()).padStart(2, '0');
+            const minutes = String(jst.getMinutes()).padStart(2, '0');
+            const seconds = String(jst.getSeconds()).padStart(2, '0');
+            const jstTime = `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
+            document.getElementById('jstClock').textContent = jstTime;
+        }
+
+        updateJSTClock();
+        setInterval(updateJSTClock, 1000);
+
+        window.onload = () => {
+            loadSavedApiKey();
+            loadSavedTheme();
+            setupMainFilterButtons();
+            setupFavoriteFilterButton();
+            setupOldFilterButton();
+            loadSchedule();
+            startAutoRefresh();
+        };
+
+        function saveApiKey() {
+            const key = document.getElementById('apiKey').value.trim();
+            if (!key) return alert('APIキーを入力してください！');
+            localStorage.setItem(API_KEY_STORAGE, key);
+            alert('APIキーを保存しました！');
+            loadSchedule();
+        }
+
+        function loadSavedApiKey() {
+            const saved = localStorage.getItem(API_KEY_STORAGE);
+            if (saved) document.getElementById('apiKey').value = saved;
+        }
+
+        function toggleTheme() {
+            const current = document.body.getAttribute('data-theme') || 'light';
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', newTheme);
+            localStorage.setItem(THEME_STORAGE, newTheme);
+            document.getElementById('themeBtn').textContent = newTheme === 'dark' ? 'ライトモード' : 'ダークモード';
+        }
+
+        function loadSavedTheme() {
+            const saved = localStorage.getItem(THEME_STORAGE) || 'light';
+            document.body.setAttribute('data-theme', saved);
+            document.getElementById('themeBtn').textContent = saved === 'dark' ? 'ライトモード' : 'ダークモード';
+        }
+
+        // メインのフィルターボタン（すべて/告知/チェック済み）
+        function setupMainFilterButtons() {
+            document.querySelectorAll('.tab-button[data-mode]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-button[data-mode]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    isFavoriteFilterActive = false;
+                    document.getElementById('favoriteFilterBtn').textContent = '推しのみ OFF';
+                    document.getElementById('favoriteFilterBtn').classList.remove('active');
+                    applyFilter(btn.dataset.mode);
+                });
+            });
+        }
+
+        // 推しのみボタン
+        function setupFavoriteFilterButton() {
+            const btn = document.getElementById('favoriteFilterBtn');
+            btn.addEventListener('click', () => {
+                isFavoriteFilterActive = !isFavoriteFilterActive;
+                btn.textContent = isFavoriteFilterActive ? '推しのみ ON' : '推しのみ OFF';
+                btn.classList.toggle('active', isFavoriteFilterActive);
+                if (isFavoriteFilterActive) {
+                    document.querySelectorAll('.tab-button[data-mode]').forEach(b => b.classList.remove('active'));
+                }
+                applyFilter();
+            });
+        }
+
+        // 2時間経過ボタン
+        function setupOldFilterButton() {
+            const btn = document.getElementById('oldFilterBtn');
+            btn.addEventListener('click', () => {
+                isHideOldFilterActive = !isHideOldFilterActive;
+                btn.textContent = `2時間経過枠を非表示 ${isHideOldFilterActive ? 'ON' : 'OFF'}`;
+                btn.classList.toggle('active', isHideOldFilterActive);
+                applyFilter();
+            });
+        }
+
+        const ANNOUNCE_KEYWORDS = ['告知', 'お披露目', '発表', 'デビュー', '新衣装', '重大', '緊急', '初配信', 'おひろめ'];
+
+        function applyFilter(mode = 'all') {
+            const timeGroups = document.querySelectorAll('.time-group');
+            const now = Date.now();
+
+            timeGroups.forEach(group => {
+                const cards = group.querySelectorAll('.stream-card');
+                let hasVisible = false;
+
+                cards.forEach(card => {
+                    const title = card.querySelector('.stream-title').textContent;
+                    const videoId = card.dataset.videoId;
+                    const channelId = card.dataset.channelId;
+                    const startTime = parseInt(card.dataset.startTime);
+                    const isAnnounce = ANNOUNCE_KEYWORDS.some(kw => title.includes(kw));
+                    const isChecked = checkedVideos.has(videoId);
+                    const isFavorite = favoriteChannels.has(channelId);
+                    const isOver2h = startTime && (now - startTime) > 2 * 60 * 60 * 1000;
+
+                    let show = true;
+
+                    if (isHideOldFilterActive && isOver2h) show = false;
+                    if (show && isFavoriteFilterActive) show = isFavorite;
+                    if (show && mode === 'announce') show = isAnnounce;
+                    if (show && mode === 'checked') show = isChecked;
+
+                    card.style.display = show ? 'inline-block' : 'none';
+                    if (show) hasVisible = true;
+                });
+
+                group.style.display = hasVisible ? 'block' : 'none';
+            });
+        }
+
+        function clearAllChecks() {
+            if (checkedVideos.size === 0) return alert('チェック済みの配信はありません。');
+            if (!confirm('すべてのチェックを外しますか？')) return;
+            checkedVideos.clear();
+            localStorage.setItem(CHECKED_STORAGE, '[]');
+            document.querySelectorAll('.checkbox-overlay').forEach(el => el.classList.remove('checked'));
+            applyFilter();
+            alert('すべてのチェックを外しました。');
+        }
+
+        function clearAllFavorites() {
+            if (favoriteChannels.size === 0) return alert('推し登録されたチャンネルはありません。');
+            if (!confirm('すべての推し登録を解除しますか？')) return;
+            favoriteChannels.clear();
+            localStorage.setItem(FAVORITE_CHANNELS_STORAGE, '[]');
+            document.querySelectorAll('.favorite-overlay').forEach(el => el.classList.remove('favorited'));
+            document.querySelectorAll('.stream-card').forEach(c => c.classList.remove('favorite'));
+            applyFilter();
+            alert('すべての推し登録を解除しました。');
+        }
+
+        function startAutoRefresh() {
+            clearInterval(autoRefreshTimer);
+            countdown = 300;
+            autoRefreshTimer = setInterval(() => {
+                countdown--;
+                const m = String(Math.floor(countdown / 60)).padStart(2, '0');
+                const s = String(countdown % 60).padStart(2, '0');
+                document.getElementById('timer').textContent = `${m}:${s}`;
+                if (countdown <= 0) loadSchedule();
+            }, 1000);
+        }
+
+        function showToast(msg, isStart = false) {
+            const toast = document.createElement('div');
+            toast.className = `toast ${isStart ? 'start' : ''}`;
+            toast.innerHTML = `
+                <div class="title">${isStart ? '配信の時間になりました。' : '残り5分。'}</div>
+                <div class="content">${msg}</div>
+                <button class="close" onclick="this.parentElement.remove()">x</button>
+            `;
+            document.getElementById('toastContainer').appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('fade-out');
+                setTimeout(() => toast.remove(), 300);
+            }, 60000);
+        }
+
+        async function loadSchedule() {
+            const apiKey = document.getElementById('apiKey').value.trim() || localStorage.getItem(API_KEY_STORAGE);
+            if (!apiKey) {
+                document.getElementById('content').innerHTML = 
+                    `<p class="error">APIキーが必要です！<a href="https://holodex.net/" target="_blank">holodex.net</a>で取得</p>`;
+                return;
+            }
+
+            const headers = { 'X-APIKEY': apiKey };
+            const content = document.getElementById('content');
+            content.innerHTML = '<p class="loading">読み込み中...</p>';
+
+            try {
+                const res = await fetch('https://holodex.net/api/v2/live?org=Hololive&status=live,upcoming&sort=available_at&order=asc&limit=100', { headers });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const videos = await res.json();
+                if (!videos.length) {
+                    content.innerHTML = '<p class="no-streams">現在、配信予定はありません。</p>';
+                    return;
+                }
+
+                notifiedVideos.clear();
+                const groups = {};
+                videos.forEach(v => {
+                    const d = new Date(v.available_at);
+                    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:00`;
+                    if (!groups[key]) groups[key] = [];
+                    groups[key].push(v);
+                });
+
+                let html = '';
+                Object.keys(groups).sort().forEach(k => {
+                    html += `<div class="time-group"><div class="time-header">${k}</div><div class="schedule-container">`;
+                    groups[k].forEach(v => {
+                        const cid = v.channel?.id || 'unknown';
+                        const cname = v.channel?.name || 'Unknown';
+                        const isMember = v.channel?.org === 'Hololive';
+                        const thumb = v.thumbnail || `https://img.youtube.com/vi/${v.id}/hqdefault.jpg`;
+                        const url = `https://youtu.be/${v.id}`;
+                        const time = new Date(v.available_at).toLocaleString('ja-JP', {hour:'2-digit', minute:'2-digit'});
+                        const status = v.status === 'live' ? 'LIVE' : time;
+                        const isAnn = ANNOUNCE_KEYWORDS.some(kw => v.title.includes(kw));
+                        const stClass = isAnn ? 'announce' : (v.status === 'live' ? 'live' : 'upcoming');
+                        const stText = isAnn ? '告知' : status;
+                        const checked = checkedVideos.has(v.id);
+                        const fav = favoriteChannels.has(cid);
+                        const startMs = new Date(v.available_at).getTime();
+
+                        html += `
+                        <div class="stream-card ${fav?'favorite':''}" data-video-id="${v.id}" data-channel-id="${cid}" data-start-time="${startMs}">
+                            <div class="thumbnail-wrapper">
+                                <a href="${url}" target="_blank"><img src="${thumb}" class="thumbnail" onerror="this.src='https://via.placeholder.com/280x158?text=No+Image'"></a>
+                                <div class="checkbox-overlay ${checked?'checked':''}" onclick="event.stopPropagation();toggleCheck('${v.id}',this)"></div>
+                                ${isMember ? `<div class="favorite-overlay ${fav?'favorited':''}" onclick="event.stopPropagation();toggleFavoriteChannel('${cid}',this)"></div>` : ''}
+                            </div>
+                            <div class="stream-info">
+                                <div class="member-name">${cname}</div>
+                                <div class="stream-title">${v.title}</div>
+                            </div>
+                            <div class="status-indicator ${stClass}">${stText}</div>
+                        </div>`;
+
+                        if ((checked || fav) && v.status === 'upcoming') {
+                            const st = new Date(v.available_at).getTime();
+                            const vid = v.id;
+                            const title = v.title.length > 30 ? v.title.slice(0,27)+'...' : v.title;
+                            ['_5min', '_start'].forEach((s, i) => {
+                                if (!notifiedVideos.has(vid + s)) {
+                                    const delay = i === 0 ? st - 5*60*1000 - Date.now() : st - Date.now();
+                                    if (delay > 0) {
+                                        setTimeout(() => {
+                                            if (!notifiedVideos.has(vid + s)) {
+                                                showToast(`${cname} ${title}`, i === 1);
+                                                notifiedVideos.add(vid + s);
+                                            }
+                                        }, delay);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                    html += `</div></div>`;
+                });
+
+                content.innerHTML = html;
+                applyFilter();
+                startAutoRefresh();
+            } catch (e) {
+                content.innerHTML = `<p class="error">読み込み失敗: ${e.message}</p>`;
+            }
+        }
+
+        function toggleCheck(id, el) {
+            event.stopPropagation();
+            if (checkedVideos.has(id)) {
+                checkedVideos.delete(id);
+                el.classList.remove('checked');
+            } else {
+                checkedVideos.add(id);
+                el.classList.add('checked');
+            }
+            localStorage.setItem(CHECKED_STORAGE, JSON.stringify([...checkedVideos]));
+            applyFilter();
+        }
+
+        function toggleFavoriteChannel(id, el) {
+            event.stopPropagation();
+            if (favoriteChannels.has(id)) {
+                favoriteChannels.delete(id);
+                el.classList.remove('favorited');
+            } else {
+                favoriteChannels.add(id);
+                el.classList.add('favorited');
+            }
+            localStorage.setItem(FAVORITE_CHANNELS_STORAGE, JSON.stringify([...favoriteChannels]));
+            document.querySelectorAll(`.stream-card[data-channel-id="${id}"]`).forEach(c => {
+                c.classList.toggle('favorite', favoriteChannels.has(id));
+                const ov = c.querySelector('.favorite-overlay');
+                if (ov) ov.classList.toggle('favorited', favoriteChannels.has(id));
+            });
+            applyFilter();
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 'p') {
+                const h = e2 => {
+                    if (e2.key === 'i') showToast('ぺこら テスト');
+                    else if (e2.key === 'o') showToast('ぺこら テスト', true);
+                    document.removeEventListener('keyup', h);
+                };
+                document.addEventListener('keyup', h);
+                setTimeout(() => document.removeEventListener('keyup', h), 3000);
+            }
+        });
+    </script>
+</body>
+</html>
