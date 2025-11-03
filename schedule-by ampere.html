@@ -387,7 +387,7 @@
             let output = title ? `【${title}】\n\n` : '';
             Object.keys(groups).sort().forEach(time => {
                 groups[time].forEach(item => {
-                    output += `■ ${time} ~ ${item.member}視点\n${item.url}\n\n`;
+                    output += `■ ${time} ~ ${item.member}枠\n${item.url}\n\n`;
                 });
             });
             const outputEl = document.getElementById('linkOutput');
@@ -403,7 +403,7 @@
             const originalText = btn.textContent;
             const originalBg = btn.style.background;
             navigator.clipboard.writeText(text).then(() => {
-                btn.textContent = 'コピー完了！';
+                btn.textContent = 'コピー完了';
                 btn.style.background = '#4CAF50';
                 setTimeout(() => {
                     btn.textContent = originalText;
@@ -480,7 +480,7 @@
         async function loadSchedule() {
             const apiKey = localStorage.getItem(API_KEY_STORAGE);
             if (!apiKey) {
-                document.getElementById('content').innerHTML = '<p class="error">APIキーを入力してください！</p>';
+                document.getElementById('content').innerHTML = '<p class="error">APIキーを入力してください。</p>';
                 return;
             }
             const content = document.getElementById('content');
@@ -564,7 +564,6 @@
             applyFilter(currentMode);
         }
 
-        // 通知表示（開発者モード中は重複OK！）
         function showToast(message, isLive = false) {
             if (!devMode && [...toastContainer.children].some(t => t.querySelector('.body')?.textContent === message)) return;
 
@@ -577,7 +576,7 @@
             `;
             toastContainer.appendChild(toast);
             requestAnimationFrame(() => toast.classList.add('show'));
-            const timer = setTimeout(() => closeToast(toast.querySelector('.close-btn')), 600000);
+            const timer = setTimeout(() => closeToast(toast.querySelector('.close-btn')), 600000);//通知表示時間
             toast.dataset.timer = timer;
         }
 
@@ -631,13 +630,13 @@
                 e.preventDefault();
                 devMode = true;
                 document.body.style.border = '4px solid #FF00FF';
-                alert('開発者モード ON！\n\ni → 5分前通知テスト（無限連打OK）\n o → 開始通知テスト（無限連打OK）\n\nEnter で終了');
+                alert('開発者モード\n\ni → 5分前通知テスト（無限連打OK）\n o → 開始通知テスト（無限連打OK）\n\nEnter で終了');
                 document.body.style.border = '';
             }
             if (devMode) {
                 if (e.key.toLowerCase() === 'i') {
                     e.preventDefault();
-                    showToast('さくらみこ - みこちの朝雑談！', false);
+                    showToast('さくらみこ - みこちの朝雑談', false);
                 }
                 if (e.key.toLowerCase() === 'o') {
                     e.preventDefault();
@@ -658,3 +657,4 @@
     </script>
 </body>
 </html>
+
