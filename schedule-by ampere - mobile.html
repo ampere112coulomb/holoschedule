@@ -23,6 +23,8 @@
             --favorite-border: #FFA000;
             --favorite-card-border: #FFC107;
             --panel-bg: rgba(255,255,255,0.98);
+            --modal-bg: rgba(0,0,0,0.7);
+            --toggle-btn-bg: #4CAF50;
         }
         [data-theme="dark"] {
             --bg-gradient: linear-gradient(135deg, #0D47A1, #1A1A1A);
@@ -41,6 +43,8 @@
             --favorite-border: #FF8F00;
             --favorite-card-border: #FFB300;
             --panel-bg: rgba(30,30,30,0.98);
+            --modal-bg: rgba(0,0,0,0.8);
+            --toggle-btn-bg: #66BB6A;
         }
         * { box-sizing: border-box; }
         body {
@@ -54,323 +58,213 @@
             padding-bottom: 80px;
         }
         .clock {
-            position: fixed;
-            top: 12px;
-            left: 12px;
-            background: var(--clock-bg);
-            padding: 8px 12px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px var(--shadow);
-            font-size: 0.95rem;
-            font-weight: bold;
-            color: var(--clock-text);
-            z-index: 1000;
-            border: 1px solid var(--border);
+            position: fixed; top: 12px; left: 12px;
+            background: var(--clock-bg); padding: 8px 12px; border-radius: 8px;
+            box-shadow: 0 2px 8px var(--shadow); font-size: 0.95rem; font-weight: bold;
+            color: var(--clock-text); z-index: 1000; border: 1px solid var(--border);
         }
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: var(--panel-bg);
-            border-radius: 12px;
-            box-shadow: 0 4px 20px var(--shadow);
-            padding: 16px;
+            max-width: 1200px; margin: 0 auto; background: var(--panel-bg);
+            border-radius: 12px; box-shadow: 0 4px 20px var(--shadow); padding: 16px;
         }
         h1 { text-align: center; color: var(--header-bg); font-size: 1.8rem; margin: 0 0 16px; font-weight: 700; }
+
         .info {
-            font-size: 0.85rem;
-            color: #D32F2F;
-            background: #FFEBEE;
-            padding: 10px;
-            border-radius: 6px;
-            text-align: center;
-            margin: 10px 0;
+            font-size: 0.85rem; color: #D32F2F; background: #FFEBEE; padding: 10px;
+            border-radius: 6px; text-align: center; margin: 10px 0;
         }
         [data-theme="dark"] .info { background: #440000; color: #FF8A80; }
 
         .controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: center;
-            margin-bottom: 16px;
-            font-size: 0.9rem;
+            display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+            margin-bottom: 16px; font-size: 0.9rem;
         }
         .api-key-input {
-            padding: 10px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            width: 100%;
-            max-width: 280px;
-            background: var(--card-bg);
-            color: var(--text);
+            padding: 10px; border: 1px solid var(--border); border-radius: 6px;
+            width: 100%; max-width: 280px; background: var(--card-bg); color: var(--text);
             font-size: 0.95rem;
         }
         button {
-            padding: 10px 14px;
-            background: var(--header-bg);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            min-width: 80px;
-            white-space: nowrap;
+            padding: 10px 14px; background: var(--header-bg); color: white;
+            border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem;
+            min-width: 80px; white-space: nowrap;
         }
         button:hover, button:active { background: #0277BD; }
-        .tab-button {
-            background: #E0E0E0;
-            color: #333;
-            font-weight: 500;
-        }
+        .tab-button { background: #E0E0E0; color: #333; font-weight: 500; }
         .tab-button.active { background: var(--header-bg); color: white; }
         [data-theme="dark"] .tab-button { background: #333; color: #EEE; }
         .filter-announce { background: var(--announce) !important; }
         .filter-checked { background: var(--check-bg) !important; }
         .filter-favorite { background: var(--favorite-bg) !important; color: #000 !important; }
 
+        /* トグルボタン */
+        #toggleCheckedBtn {
+            position: fixed; right: 16px; bottom: 16px; z-index: 998;
+            background: var(--toggle-btn-bg); color: white; padding: 12px 16px;
+            border-radius: 50px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;
+            cursor: pointer; transition: all 0.3s;
+        }
+        #toggleCheckedBtn:hover { transform: scale(1.05); }
+        #toggleCheckedBtn .count {
+            background: rgba(255,255,255,0.3); padding: 2px 8px; border-radius: 12px; font-size: 0.8rem;
+        }
+
         .time-group { margin-bottom: 20px; }
         .time-header {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: #FFF;
-            background: var(--header-bg);
-            padding: 10px 12px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            font-size: 1.1rem; font-weight: bold; color: #FFF; background: var(--header-bg);
+            padding: 10px 12px; border-radius: 6px; display: flex;
+            align-items: center; justify-content: space-between;
         }
         .header-checkbox {
-            width: 28px; height: 28px;
-            border-radius: 50%;
-            cursor: pointer;
-            background: rgba(255,255,255,0.3);
-            border: 2px solid rgba(255,255,255,0.6);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-            transition: all 0.2s;
+            width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
+            background: rgba(255,255,255,0.3); border: 2px solid rgba(255,255,255,0.6);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3); transition: all 0.2s;
         }
         .header-checkbox.checked { background: var(--check-bg); border-color: var(--check-bg); }
 
         .schedule-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 12px;
-            padding: 8px 0;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px; padding: 8px 0;
         }
         .stream-card {
-            background: var(--card-bg);
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px var(--shadow);
-            position: relative;
-            border: 2px solid transparent;
-            transition: transform 0.2s, border 0.2s;
-            display: flex;
-            flex-direction: column;
+            background: var(--card-bg); border-radius: 10px; overflow: hidden;
+            box-shadow: 0 2px 8px var(--shadow); position: relative;
+            border: 2px solid transparent; transition: transform 0.2s, border 0.2s;
+            display: flex; flex-direction: column;
         }
         .stream-card.favorite { border-color: var(--favorite-card-border) !important; }
         .stream-card:active { transform: scale(0.98); }
 
-        .thumbnail-wrapper {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 16/9;
-            overflow: hidden;
-        }
-        .thumbnail {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        .thumbnail-wrapper { position: relative; width: 100%; aspect-ratio: 16/9; overflow: hidden; }
+        .thumbnail { width: 100%; height: 100%; object-fit: cover; }
         .checkbox-overlay, .favorite-overlay {
-            position: absolute;
-            width: 40px; height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            z-index: 10;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-            transition: all 0.2s;
-            top: 8px;
+            position: absolute; width: 40px; height: 40px; border-radius: 50%;
+            cursor: pointer; z-index: 10; box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            transition: all 0.2s; top: 8px;
         }
-        .checkbox-overlay {
-            right: 8px;
-            background: rgba(255,255,255,0.4);
-            border: 3px solid rgba(255,255,255,0.7);
-        }
-        .checkbox-overlay.checked {
-            background: var(--check-bg);
-            border-color: var(--check-bg);
-        }
-        .favorite-overlay {
-            left: 8px;
-            background: rgba(255,255,255,0.5);
-            border: 3px solid var(--favorite-border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-        }
-        .favorite-overlay::before { content: '★'; color: transparent; }
-        .favorite-overlay.favorited {
-            background: var(--favorite-bg);
-            color: white !important;
-        }
+        .checkbox-overlay { right: 8px; background: rgba(255,255,255,0.4); border: 3px solid rgba(255,255,255,0.7); }
+        .checkbox-overlay.checked { background: var(--check-bg); border-color: var(--check-bg); }
+        .favorite-overlay { left: 8px; background: rgba(255,255,255,0.5); border: 3px solid var(--favorite-border); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .favorite-overlay::before { content: 'star'; color: transparent; }
+        .favorite-overlay.favorited { background: var(--favorite-bg); color: white !important; }
 
-        .stream-info {
-            padding: 10px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-        .member-name {
-            font-size: 1.05rem;
-            font-weight: bold;
-            color: var(--header-bg);
-            margin-bottom: 4px;
-        }
-        .stream-title {
-            font-size: 0.9rem;
-            color: #555;
-            line-height: 1.4;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            flex: 1;
-        }
+        .stream-info { padding: 10px; flex: 1; display: flex; flex-direction: column; }
+        .member-name { font-size: 1.05rem; font-weight: bold; color: var(--header-bg); margin-bottom: 4px; }
+        .stream-title { font-size: 0.9rem; color: #555; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; flex: 1; }
         [data-theme="dark"] .stream-title { color: #CCC; }
 
         .status-indicator {
-            position: absolute;
-            bottom: 8px;
-            right: 8px;
-            padding: 4px 10px;
-            border-radius: 6px;
-            color: white;
-            font-size: 0.8rem;
-            font-weight: bold;
+            position: absolute; bottom: 8px; right: 8px; padding: 4px 10px;
+            border-radius: 6px; color: white; font-size: 0.8rem; font-weight: bold;
         }
         .live { background: var(--live); }
         .upcoming { background: var(--upcoming); }
         .announce { background: var(--announce); }
 
+        /* チェックパネル（トグル） */
         #checkedPanel {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--panel-bg);
-            border-top: 3px solid var(--check-bg);
-            border-radius: 12px 12px 0 0;
-            padding: 16px;
-            z-index: 999;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
-            max-height: 70vh;
-            overflow-y: auto;
-            transform: translateY(100%);
-            transition: transform 0.3s ease;
+            position: fixed; bottom: 80px; right: 16px; width: 340px; background: var(--panel-bg);
+            border: 2px solid var(--check-bg); border-radius: 12px; padding: 16px;
+            z-index: 997; box-shadow: 0 8px 25px rgba(0,0,0,0.3); max-height: 60vh;
+            overflow-y: auto; transform: translateX(120%); transition: transform 0.3s ease;
             display: none;
         }
         #checkedPanel.show {
-            transform: translateY(0);
-            display: block;
+            transform: translateX(0); display: block;
         }
         #checkedPanel .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            font-weight: bold;
-            color: var(--check-bg);
-            font-size: 1.1rem;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 12px; font-weight: bold; color: var(--check-bg); font-size: 1.1rem;
         }
         #checkedList > div {
-            margin: 6px 0;
-            padding: 10px;
-            background: rgba(76,175,80,0.1);
-            border-radius: 8px;
-            font-size: 0.9rem;
+            margin: 6px 0; padding: 10px; background: rgba(76,175,80,0.1);
+            border-radius: 8px; font-size: 0.9rem;
+        }
+
+        /* リンクモーダル */
+        #linkModal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--modal-bg); z-index: 1001; display: none;
+            align-items: center; justify-content: center; padding: 16px;
+        }
+        #linkModal.show { display: flex; }
+        .modal-content {
+            background: var(--panel-bg); border-radius: 12px; width: 100%;
+            max-width: 500px; max-height: 80vh; overflow-y: auto;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3); padding: 16px;
+        }
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 12px; font-weight: bold; font-size: 1.1rem;
         }
         #linkOutput {
-            background: #f8f9fa;
-            color: #000;
-            padding: 12px;
-            border-radius: 6px;
-            font-family: monospace;
-            white-space: pre-wrap;
-            max-height: 180px;
-            overflow-y: auto;
-            margin-top: 10px;
-            display: none;
-            border: 1px solid #ddd;
-            font-size: 0.85rem;
+            background: #f8f9fa; color: #000; padding: 12px; border-radius: 6px;
+            font-family: monospace; white-space: pre-wrap; font-size: 0.85rem;
+            border: 1px solid #ddd; max-height: 300px; overflow-y: auto;
         }
         [data-theme="dark"] #linkOutput { background: #333; color: #EEE; border-color: #555; }
 
         #toast-container {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            align-items: center;
-            max-width: 90vw;
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            z-index: 9999; display: flex; flex-direction: column; gap: 10px;
+            align-items: center; max-width: 90vw;
         }
         .notification-toast {
-            min-width: 280px;
-            max-width: 380px;
-            background: #1E1E1E;
-            color: #FFF;
-            border-radius: 8px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
-            padding: 14px;
-            font-family: 'Segoe UI','Noto Sans JP',sans-serif;
-            border-left: 4px solid #00B7EB;
-            opacity: 0;
-            transform: translateY(20px);
+            min-width: 280px; max-width: 380px; background: #1E1E1E; color: #FFF;
+            border-radius: 8px; box-shadow: 0 8px 25px rgba(0,0,0,0.4); padding: 14px;
+            font-family: 'Segoe UI','Noto Sans JP',sans-serif; border-left: 4px solid #00B7EB;
+            opacity: 0; transform: translateY(20px);
             transition: all 0.4s cubic-bezier(0.25,0.8,0.25,1);
         }
         .notification-toast.show { opacity: 1; transform: translateY(0); }
         .notification-toast.live { border-left-color: #E53935; }
         .notification-toast .close-btn {
-            position: absolute; top: 6px; right: 10px;
-            background: none; border: none; color: #AAA;
-            font-size: 18px; cursor: pointer; padding: 0;
+            position: absolute; top: 6px; right: 10px; background: none; border: none;
+            color: #AAA; font-size: 18px; cursor: pointer; padding: 0;
         }
         .notification-toast .title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
         .notification-toast .body { font-size: 13px; line-height: 1.4; color: #DDD; }
 
         @media (max-width: 480px) {
-            .controls { gap: 6px; }
-            button { padding: 8px 10px; font-size: 0.85rem; }
-            .api-key-input { font-size: 0.9rem; }
-            h1 { font-size: 1.5rem; }
-            .schedule-container { gap: 10px; }
-            .stream-info { padding: 8px; }
-            .member-name { font-size: 1rem; }
-            .stream-title { font-size: 0.85rem; }
+            #toggleCheckedBtn { right: 12px; bottom: 12px; padding: 10px 14px; font-size: 0.85rem; }
+            #checkedPanel { width: calc(100% - 32px); right: 16px; }
         }
     </style>
 </head>
 <body>
     <div class="clock" id="jstClock">JST: 00:00:00</div>
 
+    <!-- トグルボタン -->
+    <div id="toggleCheckedBtn" onclick="toggleCheckedPanel()">
+        <span>チェック済み</span>
+        <span class="count" id="checkedCount">0</span>
+    </div>
+
+    <!-- チェックパネル -->
     <div id="checkedPanel">
         <div class="header">
-            <span>チェック済み配信 (<span id="checkedCount">0</span>)</span>
-            <button onclick="closeCheckedPanel()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#AAA;">×</button>
+            <span>チェック済み配信</span>
+            <button onclick="toggleCheckedPanel()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#AAA;">×</button>
         </div>
         <div id="checkedList"></div>
-        <button onclick="generateLinkSummary()" style="width:100%; padding:12px; background:#4CAF50; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold; font-size:0.95rem;">
+        <button onclick="openLinkModal()" style="width:100%; padding:12px; background:#4CAF50; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold; font-size:0.95rem;">
             配信リンクまとめを作成
         </button>
-        <div id="linkOutput"></div>
-        <button onclick="copyToClipboard()" id="copyBtn" style="width:100%; margin-top:8px; padding:12px; background:#2196F3; color:white; border:none; border-radius:8px; cursor:pointer; display:none; font-size:0.95rem;">
-            コピーする
-        </button>
+    </div>
+
+    <!-- リンクモーダル -->
+    <div id="linkModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>同時視聴リンク</span>
+                <button onclick="closeLinkModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#AAA;">×</button>
+            </div>
+            <div id="linkOutput"></div>
+            <button onclick="copyToClipboard()" id="copyBtn" style="width:100%; margin-top:12px; padding:12px; background:#2196F3; color:white; border:none; border-radius:8px; cursor:pointer; font-size:0.95rem;">
+                コピーする
+            </button>
+        </div>
     </div>
 
     <div id="toast-container"></div>
@@ -464,34 +358,37 @@
 
         function updateCheckedPanel() {
             const list = document.getElementById('checkedList');
-            const panel = document.getElementById('checkedPanel');
             const countEl = document.getElementById('checkedCount');
             const checked = document.querySelectorAll('.checkbox-overlay.checked');
-            countEl.textContent = checked.length;
-            if (checked.length === 0) {
-                panel.classList.remove('show');
-                setTimeout(() => panel.style.display = 'none', 300);
-                document.getElementById('linkOutput').style.display = 'none';
-                document.getElementById('copyBtn').style.display = 'none';
+            const count = checked.length;
+            countEl.textContent = count;
+            if (count === 0) {
+                list.innerHTML = '<p style="text-align:center;color:#999;font-size:0.9rem;">チェックなし</p>';
                 return;
             }
             let html = '';
             checked.forEach(el => {
                 const card = el.closest('.stream-card');
-                const member = card.querySelector('.member-name').textContent;
-                const title = card.querySelector('.stream-title').textContent;
+                if (!card) return;
+                const member = card.querySelector('.member-name')?.textContent || 'Unknown';
+                const title = card.querySelector('.stream-title')?.textContent || '';
                 const time = new Date(parseInt(card.dataset.startTime)).toLocaleString('ja-JP', {hour:'2-digit', minute:'2-digit'});
                 html += `<div><strong>${member}</strong><br><small>${time} ~ ${title.slice(0,25)}${title.length>25?'...':''}</small></div>`;
             });
             list.innerHTML = html;
-            panel.style.display = 'block';
-            setTimeout(() => panel.classList.add('show'), 10);
         }
 
-        function closeCheckedPanel() {
+        function toggleCheckedPanel() {
             const panel = document.getElementById('checkedPanel');
-            panel.classList.remove('show');
-            setTimeout(() => panel.style.display = 'none', 300);
+            const isShown = panel.classList.contains('show');
+            if (isShown) {
+                panel.classList.remove('show');
+                setTimeout(() => panel.style.display = 'none', 300);
+            } else {
+                updateCheckedPanel(); // 最新情報で更新
+                panel.style.display = 'block';
+                setTimeout(() => panel.classList.add('show'), 10);
+            }
         }
 
         function updateHeaderCheckboxes() {
@@ -499,14 +396,11 @@
                 const cards = group.querySelectorAll('.stream-card');
                 const headerCheck = group.querySelector('.header-checkbox');
                 if (!headerCheck || cards.length === 0) return;
-                let checkedCount = 0;
-                cards.forEach(card => {
-                    if (checkedVideos.has(card.dataset.videoId)) checkedCount++;
-                });
-                const allChecked = checkedCount === cards.length;
-                const someChecked = checkedCount > 0 && !allChecked;
+                const videoIds = Array.from(cards).map(c => c.dataset.videoId);
+                const allChecked = videoIds.every(id => checkedVideos.has(id));
+                const someChecked = videoIds.some(id => checkedVideos.has(id));
                 headerCheck.classList.toggle('checked', allChecked || someChecked);
-                if (someChecked) {
+                if (someChecked && !allChecked) {
                     headerCheck.style.background = 'linear-gradient(to right, var(--check-bg) 50%, rgba(255,255,255,0.3) 50%)';
                 } else {
                     headerCheck.style.background = allChecked ? 'var(--check-bg)' : 'rgba(255,255,255,0.3)';
@@ -520,24 +414,25 @@
             const cards = group.querySelectorAll('.stream-card');
             const videoIds = Array.from(cards).map(c => c.dataset.videoId);
             const allChecked = videoIds.every(id => checkedVideos.has(id));
-            if (allChecked) {
-                videoIds.forEach(id => checkedVideos.delete(id));
-            } else {
-                videoIds.forEach(id => checkedVideos.add(id));
-            }
-            localStorage.setItem(CHECKED_STORAGE, JSON.stringify([...checkedVideos]));
-            document.querySelectorAll('.checkbox-overlay').forEach(ov => {
-                const onclickStr = ov.getAttribute('onclick');
-                if (onclickStr && videoIds.some(id => onclickStr.includes(`'${id}'`))) {
-                    ov.classList.toggle('checked', checkedVideos.has(id));
-                }
+            const newState = !allChecked;
+
+            videoIds.forEach(id => {
+                if (newState) checkedVideos.add(id);
+                else checkedVideos.delete(id);
             });
+            localStorage.setItem(CHECKED_STORAGE, JSON.stringify([...checkedVideos]));
+
+            cards.forEach(card => {
+                const overlay = card.querySelector('.checkbox-overlay');
+                if (overlay) overlay.classList.toggle('checked', newState);
+            });
+
             updateCheckedPanel();
             updateHeaderCheckboxes();
             applyFilter(currentMode);
         }
 
-        function generateLinkSummary() {
+        function openLinkModal() {
             const checked = document.querySelectorAll('.checkbox-overlay.checked');
             if (checked.length === 0) return alert('チェックがありません！');
             const title = prompt('タイトルを入力（空欄OK）', '推し同時視聴リンク');
@@ -559,11 +454,12 @@
                     output += `■ ${time} ~ ${item.member}視点\n${item.url}\n\n`;
                 });
             });
-            const outputEl = document.getElementById('linkOutput');
-            const copyBtn = document.getElementById('copyBtn');
-            outputEl.textContent = output.trim();
-            outputEl.style.display = 'block';
-            copyBtn.style.display = 'block';
+            document.getElementById('linkOutput').textContent = output.trim();
+            document.getElementById('linkModal').classList.add('show');
+        }
+
+        function closeLinkModal() {
+            document.getElementById('linkModal').classList.remove('show');
         }
 
         function copyToClipboard() {
@@ -582,13 +478,10 @@
 
         function toggleCheck(id, el) {
             event.stopPropagation();
-            if (checkedVideos.has(id)) {
-                checkedVideos.delete(id);
-                el.classList.remove('checked');
-            } else {
-                checkedVideos.add(id);
-                el.classList.add('checked');
-            }
+            const has = checkedVideos.has(id);
+            if (has) checkedVideos.delete(id);
+            else checkedVideos.add(id);
+            el.classList.toggle('checked', !has);
             localStorage.setItem(CHECKED_STORAGE, JSON.stringify([...checkedVideos]));
             updateCheckedPanel();
             updateHeaderCheckboxes();
@@ -707,6 +600,8 @@
                     html += `</div></div>`;
                 });
                 content.innerHTML = html || '<p class="no-streams">配信予定なし</p>';
+
+                // ここで必ず更新
                 updateCheckedPanel();
                 updateHeaderCheckboxes();
                 applyFilter(currentMode);
@@ -718,16 +613,13 @@
 
         function toggleFavorite(id, el) {
             event.stopPropagation();
-            if (favoriteChannels.has(id)) {
-                favoriteChannels.delete(id);
-                el.classList.remove('favorited');
-            } else {
-                favoriteChannels.add(id);
-                el.classList.add('favorited');
-            }
+            const has = favoriteChannels.has(id);
+            if (has) favoriteChannels.delete(id);
+            else favoriteChannels.add(id);
+            el.classList.toggle('favorited', !has);
             localStorage.setItem(FAVORITE_CHANNELS_STORAGE, JSON.stringify([...favoriteChannels]));
             document.querySelectorAll(`.stream-card[data-channel-id="${id}"]`).forEach(c => {
-                c.classList.toggle('favorite', favoriteChannels.has(id));
+                c.classList.toggle('favorite', !has);
             });
             applyFilter(currentMode);
         }
@@ -795,6 +687,7 @@
             loadSchedule();
             startAutoRefresh();
             checkNotifications();
+            updateCheckedPanel(); // 初期化
         };
     </script>
 </body>
