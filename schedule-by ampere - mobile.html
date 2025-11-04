@@ -275,7 +275,6 @@
     </div>
 
     <script>
-        // === ハードコーディングされたAPIキー ===
         const API_KEY = 'ffae7804-5730-4ec9-9931-1d31cc52b9d2';
 
         const CHECKED_STORAGE = 'hololive_checked_videos';
@@ -403,8 +402,14 @@
         function openLinkModal() {
             const checked = document.querySelectorAll('.checkbox-overlay.checked');
             if (checked.length === 0) return alert('チェックがありません！');
-            const title = prompt('タイトルを入力（空欄OK）', '推し同時視聴リンク');
+
+            const title = prompt('タイトルを入力（空欄OK）', '');
             if (title === null) return;
+
+            const viewText = prompt('例：視点 / 配信 / 枠 / 部屋 (空欄OK)', '');
+            if (viewText === null) return;
+            const view = viewText.trim() || '';
+
             const groups = {};
             checked.forEach(el => {
                 const card = el.closest('.stream-card');
@@ -412,16 +417,21 @@
                 const url = `https://youtu.be/${videoId}`;
                 const member = card.querySelector('.member-name').textContent;
                 const date = new Date(parseInt(card.dataset.startTime));
-                const key = date.toLocaleDateString('ja-JP', {month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'}).replace(/\/(\d)\//g, '/0$1/');
+                const key = date.toLocaleDateString('ja-JP', {
+                    month: 'numeric', day: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
+                }).replace(/\/(\d)\//g, '/0$1/');
                 if (!groups[key]) groups[key] = [];
                 groups[key].push({member, url});
             });
+
             let output = title ? `【${title}】\n\n` : '';
             Object.keys(groups).sort().forEach(time => {
                 groups[time].forEach(item => {
-                    output += `■ ${time} ~ ${item.member}視点\n${item.url}\n\n`;
+                    output += `■${time} ~ ${item.member}${view}\n${item.url}\n\n`;
                 });
             });
+
             document.getElementById('linkOutput').textContent = output.trim();
             document.getElementById('linkModal').classList.add('show');
         }
