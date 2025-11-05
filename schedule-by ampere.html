@@ -71,18 +71,16 @@
             padding: 20px;
         }
         [data-theme="dark"] .container { background: rgba(30,30,30,0.98); }
-        
-        /* ロゴ画像スタイル */
+       
         .logo-img {
-    width: 600px;           /* 最大600px */
-    max-width: 100%;        /* スマホでは画面幅にフィット */
-    height: auto;           /* アスペクト比維持 */
+    width: 600px; 
+    max-width: 100%; 
+    height: auto; 
     display: block;
     margin: 0 auto 20px;
     border-radius: 8px;
     box-shadow: 0 2px 8px var(--shadow);
 }
-
         .controls { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 20px; }
         button { padding: 8px 16px; background: var(--header-bg); color: white; border: none; border-radius: 4px; cursor: pointer; }
         button:hover { background: #0277BD; }
@@ -205,10 +203,9 @@
     </div>
     <div id="toast-container"></div>
     <div class="container">
-
 <h1 style="margin:0;padding:0;text-align:center;">
-    <img src="https://drive.google.com/thumbnail?id=1L0g9BOCy2OkCuPPqZP1LoqeXQKP-OhRJ&sz=w1200" 
-         alt="hololist" 
+    <img src="https://drive.google.com/thumbnail?id=1L0g9BOCy2OkCuPPqZP1LoqeXQKP-OhRJ&sz=w1200"
+         alt="hololist"
          class="logo-img">
 </h1>
         <div class="controls">
@@ -225,9 +222,7 @@
         </div>
         <div id="content">読み込み中...</div>
     </div>
-
     <script>
-        // 以下、元のスクリプト（変更なし）
         const API_KEY = 'ffae7804-5730-4ec9-9931-1d31cc52b9d2';
         const CHECKED_STORAGE = 'hololive_checked_videos';
         const FAVORITE_CHANNELS_STORAGE = 'hololive_favorite_channels';
