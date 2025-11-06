@@ -25,6 +25,8 @@
             --panel-bg: rgba(255,255,255,0.98);
             --modal-bg: rgba(0,0,0,0.7);
             --toggle-btn-bg: #4CAF50;
+            --search-bg: #f5f5f5;
+            --search-border: #ddd;
         }
         [data-theme="dark"] {
             --bg-gradient: linear-gradient(135deg, #0D47A1, #1A1A1A);
@@ -45,6 +47,8 @@
             --panel-bg: rgba(30,30,30,0.98);
             --modal-bg: rgba(0,0,0,0.8);
             --toggle-btn-bg: #66BB6A;
+            --search-bg: #333;
+            --search-border: #555;
         }
         * { box-sizing: border-box; }
         body {
@@ -103,6 +107,17 @@
         #toggleCheckedBtn .count {
             background: rgba(255,255,255,0.3); padding: 2px 8px; border-radius: 12px; font-size: 0.8rem;
         }
+        .search-bar {
+            padding: 8px 12px;
+            border: 1px solid var(--search-border);
+            border-radius: 6px;
+            background: var(--search-bg);
+            color: var(--text);
+            font-size: 0.9rem;
+            width: 100%;
+            max-width: 300px;
+        }
+        .search-bar::placeholder { color: #999; }
         .time-group { margin-bottom: 20px; }
         .time-header {
             font-size: 1.1rem; font-weight: bold; color: #FFF; background: var(--header-bg);
@@ -212,6 +227,7 @@
         @media (max-width: 480px) {
             #toggleCheckedBtn { right: 12px; bottom: 12px; padding: 10px 14px; font-size: 0.85rem; }
             #checkedPanel { width: calc(100% - 32px); right: 16px; }
+            .search-bar { max-width: 100%; }
         }
     </style>
 </head>
@@ -253,6 +269,7 @@
         <div class="controls">
             <button onclick="loadSchedule()">更新</button>
             <button onclick="toggleTheme()" id="themeBtn">ダークモード</button>
+            <input type="text" id="searchInput" class="search-bar" placeholder="タイトル・メンバー名で検索...">
             <span style="display:flex;align-items:center;gap:4px;font-size:0.9rem;">
                 自動更新: <span id="timer">5:00</span>
             </span>
@@ -276,9 +293,11 @@
         let autoRefreshTimer;
         let currentMode = 'all';
         let isFavoriteFilterActive = false;
+        let searchText = '';
         const ANNOUNCE_KEYWORDS = ['告知', 'お披露目', '発表', 'デビュー', '新衣装', '重大', '初配信', 'おひろめ'];
         let notifyEnabled = localStorage.getItem('notifyEnabled') !== 'false';
         const toastContainer = document.getElementById('toast-container');
+
         function updateJSTClock() {
             const now = new Date();
             const jst = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Tokyo"}));
@@ -289,6 +308,7 @@
         }
         updateJSTClock();
         setInterval(updateJSTClock, 1000);
+
         function toggleTheme() {
             const isDark = document.body.getAttribute('data-theme') === 'dark';
             document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
@@ -299,6 +319,7 @@
             document.body.setAttribute('data-theme', 'dark');
             document.getElementById('themeBtn').textContent = 'ライトモード';
         }
+
         function startAutoRefresh() {
             clearInterval(autoRefreshTimer);
             countdown = 300;
@@ -310,6 +331,7 @@
                 if (countdown <= 0) loadSchedule();
             }, 1000);
         }
+
         function updateCheckedPanel() {
             const list = document.getElementById('checkedList');
             const countEl = document.getElementById('checkedCount');
@@ -331,6 +353,7 @@
             });
             list.innerHTML = html;
         }
+
         function toggleCheckedPanel() {
             const panel = document.getElementById('checkedPanel');
             const isShown = panel.classList.contains('show');
@@ -343,6 +366,7 @@
                 setTimeout(() => panel.classList.add('show'), 10);
             }
         }
+
         function updateHeaderCheckboxes() {
             document.querySelectorAll('.time-group').forEach(group => {
                 const cards = group.querySelectorAll('.stream-card');
@@ -359,6 +383,7 @@
                 }
             });
         }
+
         function toggleTimeGroupCheck(timeKey, el) {
             event.stopPropagation();
             const group = el.closest('.time-group');
@@ -373,12 +398,13 @@
             localStorage.setItem(CHECKED_STORAGE, JSON.stringify([...checkedVideos]));
             cards.forEach(card => {
                 const overlay = card.querySelector('.checkbox-overlay');
-                if (overlay) Ooverlay.classList.toggle('checked', newState);
+                if (overlay) overlay.classList.toggle('checked', newState);
             });
             updateCheckedPanel();
             updateHeaderCheckboxes();
             applyFilter(currentMode);
         }
+
         function openLinkModal() {
             const checked = document.querySelectorAll('.checkbox-overlay.checked');
             if (checked.length === 0) return alert('チェックがありません！');
@@ -410,9 +436,11 @@
             document.getElementById('linkOutput').textContent = output.trim();
             document.getElementById('linkModal').classList.add('show');
         }
+
         function closeLinkModal() {
             document.getElementById('linkModal').classList.remove('show');
         }
+
         function copyToClipboard() {
             const text = document.getElementById('linkOutput').textContent;
             navigator.clipboard.writeText(text).then(() => {
@@ -426,6 +454,7 @@
                 }, 1500);
             });
         }
+
         function toggleCheck(id, el) {
             event.stopPropagation();
             const has = checkedVideos.has(id);
@@ -437,6 +466,7 @@
             updateHeaderCheckboxes();
             applyFilter(currentMode);
         }
+
         function clearAllChecks() {
             if (!confirm('すべて解除しますか？')) return;
             checkedVideos.clear();
@@ -446,6 +476,16 @@
             updateHeaderCheckboxes();
             applyFilter(currentMode);
         }
+
+        let searchTimeout;
+        document.getElementById('searchInput').addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                searchText = this.value.toLowerCase().trim();
+                applyFilter(currentMode);
+            }, 300);
+        });
+
         function applyFilter(mode = 'all') {
             currentMode = mode;
             document.querySelectorAll('.time-group').forEach(group => {
@@ -454,11 +494,13 @@
                 cards.forEach(card => {
                     const videoId = card.dataset.videoId;
                     const channelId = card.dataset.channelId;
-                    const title = card.querySelector('.stream-title').textContent;
-                    const isAnnounce = ANNOUNCE_KEYWORDS.some(kw => title.includes(kw));
+                    const title = card.querySelector('.stream-title').textContent.toLowerCase();
+                    const member = card.querySelector('.member-name').textContent.toLowerCase();
+                    const isAnnounce = ANNOUNCE_KEYWORDS.some(kw => title.includes(kw.toLowerCase()));
                     const isChecked = checkedVideos.has(videoId);
                     const isFavorite = favoriteChannels.has(channelId);
-                    let show = true;
+                    const matchesSearch = !searchText || title.includes(searchText) || member.includes(searchText);
+                    let show = matchesSearch;
                     if (isFavoriteFilterActive && !isFavorite) show = false;
                     if (mode === 'announce' && !isAnnounce) show = false;
                     if (mode === 'checked' && !isChecked) show = false;
@@ -468,21 +510,25 @@
                 group.style.display = visibleCount > 0 ? 'block' : 'none';
             });
         }
+
         document.querySelectorAll('.tab-button[data-mode]').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.tab-button[data-mode]').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 isFavoriteFilterActive = false;
                 document.getElementById('favoriteFilterBtn').textContent = '推しのみ OFF';
+                document.getElementById('favoriteFilterBtn').classList.remove('active');
                 applyFilter(btn.dataset.mode);
             });
         });
+
         document.getElementById('favoriteFilterBtn').addEventListener('click', () => {
             isFavoriteFilterActive = !isFavoriteFilterActive;
             document.getElementById('favoriteFilterBtn').textContent = `推しのみ ${isFavoriteFilterActive ? 'ON' : 'OFF'}`;
             document.getElementById('favoriteFilterBtn').classList.toggle('active', isFavoriteFilterActive);
             applyFilter(currentMode);
         });
+
         async function loadSchedule() {
             const content = document.getElementById('content');
             content.innerHTML = '<p class="loading">読み込み中...</p>';
@@ -548,6 +594,7 @@
                 content.innerHTML = `<p class="error">読み込み失敗: ${e.message}</p>`;
             }
         }
+
         function toggleFavorite(id, el) {
             event.stopPropagation();
             const has = favoriteChannels.has(id);
@@ -560,6 +607,7 @@
             });
             applyFilter(currentMode);
         }
+
         function showToast(message, isLive = false) {
             if ([...toastContainer.children].some(t => t.querySelector('.body')?.textContent === message)) return;
             const toast = document.createElement('div');
@@ -574,12 +622,14 @@
             const timer = setTimeout(() => closeToast(toast.querySelector('.close-btn')), 600000);
             toast.dataset.timer = timer;
         }
+
         function closeToast(btn) {
             const toast = btn.parentElement;
             clearTimeout(toast.dataset.timer);
             toast.classList.remove('show');
             setTimeout(() => toast.remove(), 400);
         }
+
         function checkNotifications() {
             if (!notifyEnabled) return;
             const now = Date.now();
@@ -602,6 +652,7 @@
                 }
             });
         }
+
         const notifyBtn = document.createElement('button');
         notifyBtn.textContent = `通知: ${notifyEnabled?'ON':'OFF'}`;
         notifyBtn.style.background = notifyEnabled ? '#FF9800' : '#666';
@@ -613,7 +664,9 @@
             localStorage.setItem('notifyEnabled', notifyEnabled);
         };
         document.querySelectorAll('.controls')[0].appendChild(notifyBtn);
+
         setInterval(checkNotifications, 10000);
+
         window.onload = () => {
             loadSchedule();
             startAutoRefresh();
