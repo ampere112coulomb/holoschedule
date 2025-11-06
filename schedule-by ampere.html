@@ -18,13 +18,14 @@
             --announce: #FF6D00;
             --memorial: #FF69B4;
             --check-bg: #4CAF50;
-            --check-border: #43A047; /* チェック済み枠の縁色 */
+            --check-border: #43A047;
             --all-check-bg: #4FC3F7;
             --clock-bg: rgba(255, 255, 255, 0.95);
             --clock-text: #0288D1;
             --favorite-bg: #FFD700;
             --favorite-border: #FFA000;
             --favorite-card-border: #FFC107;
+            --error: #E53935;
         }
         [data-theme="dark"] {
             --bg-gradient: linear-gradient(135deg, #0D47A1, #1A1A1A);
@@ -38,13 +39,14 @@
             --announce: #FF8A65;
             --memorial: #FF8AD4;
             --check-bg: #66BB6A;
-            --check-border: #4CAF50; /* ダークモード用縁色 */
+            --check-border: #4CAF50;
             --all-check-bg: #81D4FA;
             --clock-bg: rgba(30,30,30,0.95);
             --clock-text: #42A5F5;
             --favorite-bg: #FFB300;
             --favorite-border: #FF8F00;
             --favorite-card-border: #FFB300;
+            --error: #EF5350;
         }
         body {
             font-family: 'Noto Sans JP', sans-serif;
@@ -86,22 +88,41 @@
             border-radius: 8px;
             box-shadow: 0 2px 8px var(--shadow);
         }
-        .controls { 
-            display: flex; 
-            flex-wrap: wrap; 
-            gap: 10px; 
-            justify-content: center; 
-            margin-bottom: 20px; 
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+            align-items: center;
         }
-        button { 
-            padding: 8px 16px; 
-            background: var(--header-bg); 
-            color: white; 
-            border: none; 
-            border-radius: 4px; 
-            cursor: pointer; 
+        button {
+            padding: 8px 16px;
+            background: var(--header-bg);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
         }
         button:hover { background: #0277BD; }
+        .search-bar {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 250px;
+            font-size: 1em;
+        }
+        [data-theme="dark"] .search-bar {
+            background: #333;
+            color: #EEE;
+            border-color: #555;
+        }
+        .summary {
+            text-align: center;
+            font-size: 1.1em;
+            margin: 10px 0;
+            color: var(--header-bg);
+        }
         .filter-controls {
             display: flex;
             flex-wrap: wrap;
@@ -163,12 +184,10 @@
             content: '✓';
             font-weight: bold;
         }
-        /* 「すべて」 */
         .filter-checkbox[data-mode="all"] input:checked ~ .checkmark {
             background: var(--all-check-bg);
             border-color: var(--all-check-bg);
         }
-        /* 告知枠 */
         .filter-checkbox[data-mode="announce"] .checkmark {
             border-color: var(--announce);
         }
@@ -176,7 +195,6 @@
             background: var(--announce);
             border-color: var(--announce);
         }
-        /* 記念枠（ピンク） */
         .filter-checkbox[data-mode="memorial"] .checkmark {
             border-color: var(--memorial);
         }
@@ -189,7 +207,6 @@
             content: '✓';
             font-weight: bold;
         }
-        /* チェック済み：枠線付き */
         .filter-checkbox[data-mode="checked"] .checkmark {
             border-color: var(--check-border);
         }
@@ -202,7 +219,6 @@
             content: '✓';
             font-weight: bold;
         }
-        /* 推し */
         #favoriteFilterBtn .checkmark {
             border-color: var(--favorite-border);
         }
@@ -260,7 +276,7 @@
         .stream-card.favorite { border-color: var(--favorite-card-border) !important; }
         .stream-card:hover { transform: translateY(-3px); }
         .thumbnail { width: 100%; aspect-ratio: 16/9; object-fit: cover; }
-        .stream-info { padding: 10px; }
+        .stream-info { padding: 10px; position: relative; }
         .member-name { font-size: 1.1em; font-weight: bold; color: var(--header-bg); }
         .stream-title { font-size: 0.9em; color: #555; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         [data-theme="dark"] .stream-title { color: #CCC; }
@@ -270,32 +286,33 @@
         .announce { background: var(--announce); }
         .memorial { background: var(--memorial); }
         .checkbox-overlay, .favorite-overlay {
-            position: absolute; top: 8px; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; z-index: 10;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3); transition: all 0.2s;
+            position: absolute; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; z-index: 10;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3); transition: all 0.2s; display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
         }
-        .checkbox-overlay { right: 8px; background: rgba(255,255,255,0.3); border: 2px solid rgba(255,255,255,0.6); }
+        .checkbox-overlay { top: 8px; right: 8px; background: rgba(255,255,255,0.3); border: 2px solid rgba(255,255,255,0.6); }
         .checkbox-overlay.checked { background: var(--check-bg); border-color: var(--check-border); }
-        .favorite-overlay { left: 8px; background: rgba(255,255,255,0.4); border: 2px solid var(--favorite-border); display: flex; align-items: center; justify-content: center; }
+        .favorite-overlay { top: 8px; left: 8px; background: rgba(255,255,255,0.4); border: 2px solid var(--favorite-border); }
         .favorite-overlay::before { content: '★'; color: transparent; }
         .favorite-overlay.favorited {
             background: var(--favorite-bg);
             border-color: var(--favorite-bg);
-            color: white !important;
         }
-        .favorite-overlay.favorited::before {
-            content: '★';
-            color: white;
-        }
-        #checkedPanel {
-            position: fixed; top: 70px; right: 20px; width: 340px; background: var(--clock-bg);
+        .favorite-overlay.favorited::before { color: white; }
+        #checkedPanel, #favoritePanel {
+            position: fixed; top: 70px; width: 340px; background: var(--clock-bg);
             border: 2px solid var(--check-bg); border-radius: 10px; padding: 15px; z-index: 999;
             box-shadow: 0 4px 20px rgba(0,0,0,0.2); font-size: 0.9em; display: none;
         }
-        #checkedPanel .header {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: bold; color: var(--check-bg);
+        #favoritePanel { right: 380px; border-color: var(--favorite-bg); }
+        #checkedPanel .header, #favoritePanel .header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: bold;
         }
-        #checkedList { max-height: 220px; overflow-y: auto; margin-bottom: 10px; }
-        #checkedList > div { margin: 6px 0; padding: 8px; background: rgba(76,175,80,0.1); border-radius: 6px; }
+        #checkedPanel .header { color: var(--check-bg); }
+        #favoritePanel .header { color: var(--favorite-bg); }
+        #checkedList, #favoriteList { max-height: 220px; overflow-y: auto; margin-bottom: 10px; }
+        #checkedList > div, #favoriteList > div { margin: 6px 0; padding: 8px; background: rgba(76,175,80,0.1); border-radius: 6px; cursor: pointer; }
+        #favoriteList > div { background: rgba(255,193,7,0.1); display: flex; justify-content: space-between; align-items: center; }
         #linkOutput {
             background: #f8f9fa; color: #000; padding: 12px; border-radius: 6px; font-family: monospace;
             white-space: pre-wrap; max-height: 200px; overflow-y: auto; margin-top: 10px; display: none;
@@ -338,10 +355,23 @@
         .notification-toast .close-btn:hover { color: #FFF; }
         .notification-toast .title { font-weight: 600; font-size: 15px; margin-bottom: 6px; }
         .notification-toast .body { font-size: 14px; line-height: 1.4; color: #DDD; }
+        .error-message {
+            text-align: center;
+            color: var(--error);
+            font-weight: bold;
+            padding: 20px;
+            background: rgba(255,0,0,0.05);
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        [data-theme="dark"] .error-message {
+            background: rgba(255,0,0,0.15);
+        }
     </style>
 </head>
 <body>
     <div class="clock" id="jstClock">JST: 00:00:00</div>
+
     <div id="checkedPanel">
         <div class="header">
             <span>チェック済み配信 (<span id="checkedCount">0</span>)</span>
@@ -356,7 +386,20 @@
             コピーする
         </button>
     </div>
+
+    <div id="favoritePanel">
+        <div class="header">
+            <span>推し一覧 (<span id="favCount">0</span>)</span>
+            <button onclick="document.getElementById('favoritePanel').style.display='none'" style="background:none;border:none;font-size:20px;cursor:pointer;color:#AAA;">x</button>
+        </div>
+        <div id="favoriteList"></div>
+        <button onclick="clearAllFavorites()" style="width:100%; padding:8px; background:#FF9800; color:white; border:none; border-radius:6px; cursor:pointer; font-size:0.9em;">
+            すべて解除
+        </button>
+    </div>
+
     <div id="toast-container"></div>
+
     <div class="container">
         <h1 style="margin:0;padding:0;text-align:center;">
             <img src="https://drive.google.com/thumbnail?id=1L0g9BOCy2OkCuPPqZP1LoqeXQKP-OhRJ&sz=w1200"
@@ -366,10 +409,11 @@
         <div class="controls">
             <button onclick="loadSchedule()">更新</button>
             <button onclick="toggleTheme()" id="themeBtn">ダークモード</button>
+            <input type="text" id="searchInput" class="search-bar" placeholder="タイトル・メンバー名で検索...">
             <span class="auto-refresh">自動更新: <span id="timer">5:00</span></span>
         </div>
+        <div class="summary" id="summary">今日の配信: <strong id="todayCount">0</strong>本（LIVE: <span id="liveCount">0</span> | 予定: <span id="upcomingCount">0</span>）</div>
         <div class="filter-controls">
-            
             <label class="filter-checkbox active" data-mode="all">
                 <input type="checkbox" checked>
                 <span class="checkmark"></span>
@@ -399,6 +443,7 @@
         </div>
         <div id="content">読み込み中...</div>
     </div>
+
     <script>
         const API_KEY = 'ffae7804-5730-4ec9-9931-1d31cc52b9d2';
         const CHECKED_STORAGE = 'hololive_checked_videos';
@@ -412,6 +457,7 @@
         const MEMORIAL_KEYWORDS = ['周年', '生誕', '爆誕'];
         let notifyEnabled = localStorage.getItem('notifyEnabled') !== 'false';
         const toastContainer = document.getElementById('toast-container');
+        const notifySound = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAA');
 
         function updateJSTClock() {
             const now = new Date();
@@ -465,10 +511,46 @@
                 const member = card.querySelector('.member-name').textContent;
                 const title = card.querySelector('.stream-title').textContent;
                 const time = new Date(parseInt(card.dataset.startTime)).toLocaleString('ja-JP', {hour:'2-digit', minute:'2-digit'});
-                html += `<div><strong>${member}</strong><br><small>${time} ~ ${title.slice(0,25)}${title.length>25?'...':''}</small></div>`;
+                html += `<div onclick="document.querySelector('.stream-card[data-video-id=\\'${card.dataset.videoId}\\']').scrollIntoView()">
+                    <strong>${member}</strong><br>
+                    <small>${time} ~ ${title.slice(0,25)}${title.length>25?'...':''}</small>
+                </div>`;
             });
             list.innerHTML = html;
             panel.style.display = 'block';
+        }
+
+        function updateFavoritePanel() {
+            const list = document.getElementById('favoriteList');
+            const panel = document.getElementById('favoritePanel');
+            const countEl = document.getElementById('favCount');
+            countEl.textContent = favoriteChannels.size;
+            if (favoriteChannels.size === 0) {
+                list.innerHTML = '<div style="text-align:center; color:#999; padding:10px;">推し登録なし</div>';
+                panel.style.display = 'none';
+                return;
+            }
+            let html = '';
+            favoriteChannels.forEach(id => {
+                const channel = [...document.querySelectorAll(`.stream-card[data-channel-id="${id}"]`)].pop();
+                const name = channel ? channel.querySelector('.member-name').textContent : 'Unknown';
+                html += `<div>
+                    <span>${name}</span>
+                    <button onclick="event.stopPropagation(); toggleFavorite('${id}', this)" style="background:none;border:none;color:#F44336;font-size:18px;">×</button>
+                </div>`;
+            });
+            list.innerHTML = html;
+            panel.style.display = 'block';
+        }
+
+        function clearAllFavorites() {
+            if (!confirm('推し登録をすべて解除しますか？')) return;
+            favoriteChannels.clear();
+            localStorage.setItem(FAVORITE_CHANNELS_STORAGE, '[]');
+            document.querySelectorAll('.favorite-overlay').forEach(el => el.classList.remove('favorited'));
+            document.querySelectorAll('.stream-card').forEach(c => c.classList.remove('favorite'));
+            updateFavoritePanel();
+            applyFilter();
         }
 
         function updateHeaderCheckboxes() {
@@ -591,61 +673,64 @@
             applyFilter();
         }
 
+        let searchTimeout;
+        document.getElementById('searchInput').addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(applyFilter, 300);
+        });
+
         function applyFilter() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
             const allInput = document.querySelector('.filter-checkbox[data-mode="all"] input');
             const announceInput = document.querySelector('.filter-checkbox[data-mode="announce"] input');
             const memorialInput = document.querySelector('.filter-checkbox[data-mode="memorial"] input');
             const checkedInput = document.querySelector('.filter-checkbox[data-mode="checked"] input');
             const favoriteInput = document.getElementById('favoriteFilterBtn').querySelector('input');
-
             const filterAll = allInput.checked;
             const filterAnnounce = announceInput.checked;
             const filterMemorial = memorialInput.checked;
             const filterChecked = checkedInput.checked;
             const filterFavorite = favoriteInput.checked;
-
             isFavoriteFilterActive = filterFavorite;
             document.getElementById('favoriteFilterBtn').querySelector('span:not(.checkmark)').textContent = `推しのみ ${filterFavorite ? 'ON' : 'OFF'}`;
-
             document.querySelectorAll('.filter-checkbox').forEach(label => {
                 label.classList.toggle('active', label.querySelector('input').checked);
             });
-
             document.querySelectorAll('.time-group').forEach(group => {
                 const cards = group.querySelectorAll('.stream-card');
                 let visibleCount = 0;
                 cards.forEach(card => {
                     const videoId = card.dataset.videoId;
                     const channelId = card.dataset.channelId;
-                    const title = card.querySelector('.stream-title').textContent;
-                    const isAnnounce = ANNOUNCE_KEYWORDS.some(kw => title.includes(kw));
-                    const isMemorial = MEMORIAL_KEYWORDS.some(kw => title.includes(kw));
+                    const title = card.querySelector('.stream-title').textContent.toLowerCase();
+                    const member = card.querySelector('.member-name').textContent.toLowerCase();
+                    const isAnnounce = ANNOUNCE_KEYWORDS.some(kw => title.includes(kw.toLowerCase()));
+                    const isMemorial = MEMORIAL_KEYWORDS.some(kw => title.includes(kw.toLowerCase()));
                     const isChecked = checkedVideos.has(videoId);
                     const isFavorite = favoriteChannels.has(channelId);
-                    let show = true;
-
+                    const matchesSearch = !searchText || title.includes(searchText) || member.includes(searchText);
+                    let show = matchesSearch;
                     if (filterAll) {
-                        show = true;
+                        show = matchesSearch;
                     } else {
-                        show = true;
+                        show = matchesSearch;
                         if (filterAnnounce && !isAnnounce) show = false;
                         if (filterMemorial && !isMemorial) show = false;
                         if (filterChecked && !isChecked) show = false;
                     }
                     if (filterFavorite && !isFavorite) show = false;
-
                     card.style.display = show ? 'inline-block' : 'none';
                     if (show) visibleCount++;
                 });
                 group.style.display = visibleCount > 0 ? 'block' : 'none';
             });
+            updateSummary();
         }
 
         document.querySelectorAll('.filter-checkbox input').forEach(input => {
             input.addEventListener('change', function() {
                 const label = this.parentElement;
                 const mode = label.dataset.mode;
-
                 if (mode === 'all') {
                     if (this.checked) {
                         document.querySelectorAll('.filter-checkbox input').forEach(cb => {
@@ -658,7 +743,6 @@
                         allInput.checked = false;
                     }
                 }
-
                 applyFilter();
             });
         });
@@ -670,8 +754,15 @@
                 const res = await fetch('https://holodex.net/api/v2/live?org=Hololive&status=live,upcoming&limit=100', {
                     headers: { 'X-APIKEY': API_KEY }
                 });
-                if (!res.ok) throw new Error('APIエラー');
+                if (!res.ok) {
+                    let errMsg = 'ネットワークエラー';
+                    if (res.status === 401) errMsg = 'APIキーが無効です';
+                    if (res.status === 403) errMsg = 'アクセス拒否（API制限？）';
+                    if (res.status === 429) errMsg = 'リクエスト多すぎ（しばらく待ってね）';
+                    throw new Error(errMsg);
+                }
                 const videos = await res.json();
+                if (!Array.isArray(videos)) throw new Error('データ形式が不正です');
                 const groups = {};
                 videos.forEach(v => {
                     const d = new Date(v.available_at);
@@ -704,7 +795,7 @@
                         const stText = isMem ? '記念' : (isAnn ? '告知' : status);
                         html += `
                         <div class="stream-card ${fav?'favorite':''}" data-video-id="${v.id}" data-channel-id="${cid}" data-start-time="${startMs}">
-                            <div class="thumbnail-wrapper">
+                            <div style="position:relative;">
                                 <a href="https://youtu.be/${v.id}" target="_blank">
                                     <img src="${thumb}" class="thumbnail" onerror="this.src='https://via.placeholder.com/280x158/333/FFF?text=No+Image'">
                                 </a>
@@ -722,12 +813,28 @@
                 });
                 content.innerHTML = html || '<p class="no-streams">配信予定なし</p>';
                 updateCheckedPanel();
+                updateFavoritePanel();
                 updateHeaderCheckboxes();
                 applyFilter();
+                updateSummary();
                 startAutoRefresh();
             } catch (e) {
-                content.innerHTML = `<p class="error">読み込み失敗: ${e.message}</p>`;
+                content.innerHTML = `
+                    <div class="error-message">
+                        <p><strong>リストの読み込みに失敗しました</strong></p>
+                        <p>${e.message}</p>
+                        <p><small>【更新】ボタンを押して再試行してください。</small></p>
+                    </div>`;
             }
+        }
+
+        function updateSummary() {
+            const live = document.querySelectorAll('.status-indicator.live').length;
+            const upcoming = document.querySelectorAll('.status-indicator.upcoming').length;
+            const total = live + upcoming;
+            document.getElementById('todayCount').textContent = total;
+            document.getElementById('liveCount').textContent = live;
+            document.getElementById('upcomingCount').textContent = upcoming;
         }
 
         function toggleFavorite(id, el) {
@@ -743,6 +850,7 @@
             document.querySelectorAll(`.stream-card[data-channel-id="${id}"]`).forEach(c => {
                 c.classList.toggle('favorite', favoriteChannels.has(id));
             });
+            updateFavoritePanel();
             applyFilter();
         }
 
@@ -752,11 +860,12 @@
             toast.className = `notification-toast ${isLive ? 'live' : ''}`;
             toast.innerHTML = `
                 <button class="close-btn" onclick="closeToast(this)">x</button>
-                <div class="title">${isLive ? '配信時刻になりました' : 'あと5分。'}</div>
+                <div class="title">${isLive ? '配信開始！' : 'あと5分'}</div>
                 <div class="body">${message}</div>
             `;
             toastContainer.appendChild(toast);
             requestAnimationFrame(() => toast.classList.add('show'));
+            if (notifyEnabled) notifySound.play();
             const timer = setTimeout(() => closeToast(toast.querySelector('.close-btn')), 600000);
             toast.dataset.timer = timer;
         }
@@ -795,6 +904,7 @@
         notifyBtn.id = 'notifyBtn';
         notifyBtn.textContent = `通知: ${notifyEnabled?'ON':'OFF'}`;
         notifyBtn.style.background = notifyEnabled ? '#FF9800' : '#666';
+        notifyBtn.style.marginLeft = '10px';
         notifyBtn.onclick = () => {
             notifyEnabled = !notifyEnabled;
             notifyBtn.textContent = `通知: ${notifyEnabled?'ON':'OFF'}`;
@@ -809,6 +919,7 @@
             loadSchedule();
             startAutoRefresh();
             updateCheckedPanel();
+            updateFavoritePanel();
             checkNotifications();
         };
     </script>
