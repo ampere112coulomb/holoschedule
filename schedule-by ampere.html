@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>▷hololist</title>
+    <title>hololist</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -16,7 +16,10 @@
             --shadow: rgba(0, 0, 0, 0.1);
             --border: #00B7EB;
             --announce: #FF6D00;
+            --memorial: #FF69B4;
             --check-bg: #4CAF50;
+            --check-border: #43A047; /* チェック済み枠の縁色 */
+            --all-check-bg: #4FC3F7;
             --clock-bg: rgba(255, 255, 255, 0.95);
             --clock-text: #0288D1;
             --favorite-bg: #FFD700;
@@ -33,7 +36,10 @@
             --shadow: rgba(0,0,0,0.5);
             --border: #42A5F5;
             --announce: #FF8A65;
+            --memorial: #FF8AD4;
             --check-bg: #66BB6A;
+            --check-border: #4CAF50; /* ダークモード用縁色 */
+            --all-check-bg: #81D4FA;
             --clock-bg: rgba(30,30,30,0.95);
             --clock-text: #42A5F5;
             --favorite-bg: #FFB300;
@@ -71,25 +77,165 @@
             padding: 20px;
         }
         [data-theme="dark"] .container { background: rgba(30,30,30,0.98); }
-       
         .logo-img {
-    width: 600px; 
-    max-width: 100%; 
-    height: auto; 
-    display: block;
-    margin: 0 auto 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px var(--shadow);
-}
-        .controls { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 20px; }
-        button { padding: 8px 16px; background: var(--header-bg); color: white; border: none; border-radius: 4px; cursor: pointer; }
+            width: 600px;
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+        .controls { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 10px; 
+            justify-content: center; 
+            margin-bottom: 20px; 
+        }
+        button { 
+            padding: 8px 16px; 
+            background: var(--header-bg); 
+            color: white; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+        }
         button:hover { background: #0277BD; }
-        .tab-button { background: #E0E0E0; color: #333; }
-        .tab-button.active { background: var(--header-bg); color: white; }
-        [data-theme="dark"] .tab-button { background: #333; color: #EEE; }
-        .filter-announce { background: var(--announce) !important; }
-        .filter-checked { background: var(--check-bg) !important; }
-        .filter-favorite { background: var(--favorite-bg) !important; color: #000 !important; }
+        .filter-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .filter-checkbox {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            background: #E0E0E0;
+            color: #333;
+            border-radius: 4px;
+            cursor: pointer;
+            user-select: none;
+            font-weight: bold;
+            position: relative;
+            transition: background 0.2s;
+        }
+        [data-theme="dark"] .filter-checkbox {
+            background: #333;
+            color: #EEE;
+        }
+        .filter-checkbox:hover {
+            background: #D0D0D0;
+        }
+        [data-theme="dark"] .filter-checkbox:hover {
+            background: #444;
+        }
+        .filter-checkbox input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+        .filter-checkbox .checkmark {
+            width: 24px;
+            height: 24px;
+            background: rgba(255,255,255,0.3);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 50%;
+            margin-right: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            transition: all 0.2s;
+            font-size: 14px;
+            color: transparent;
+        }
+        .filter-checkbox input:checked ~ .checkmark {
+            background: var(--check-bg);
+            border-color: var(--check-bg);
+            color: white;
+        }
+        .filter-checkbox input:checked ~ .checkmark::after {
+            content: '✓';
+            font-weight: bold;
+        }
+        /* 「すべて」 */
+        .filter-checkbox[data-mode="all"] input:checked ~ .checkmark {
+            background: var(--all-check-bg);
+            border-color: var(--all-check-bg);
+        }
+        /* 告知枠 */
+        .filter-checkbox[data-mode="announce"] .checkmark {
+            border-color: var(--announce);
+        }
+        .filter-checkbox[data-mode="announce"] input:checked ~ .checkmark {
+            background: var(--announce);
+            border-color: var(--announce);
+        }
+        /* 記念枠（ピンク） */
+        .filter-checkbox[data-mode="memorial"] .checkmark {
+            border-color: var(--memorial);
+        }
+        .filter-checkbox[data-mode="memorial"] input:checked ~ .checkmark {
+            background: var(--memorial);
+            border-color: var(--memorial);
+            color: white;
+        }
+        .filter-checkbox[data-mode="memorial"] input:checked ~ .checkmark::after {
+            content: '✓';
+            font-weight: bold;
+        }
+        /* チェック済み：枠線付き */
+        .filter-checkbox[data-mode="checked"] .checkmark {
+            border-color: var(--check-border);
+        }
+        .filter-checkbox[data-mode="checked"] input:checked ~ .checkmark {
+            background: var(--check-bg);
+            border-color: var(--check-border);
+            color: white;
+        }
+        .filter-checkbox[data-mode="checked"] input:checked ~ .checkmark::after {
+            content: '✓';
+            font-weight: bold;
+        }
+        /* 推し */
+        #favoriteFilterBtn .checkmark {
+            border-color: var(--favorite-border);
+        }
+        #favoriteFilterBtn input:checked ~ .checkmark {
+            background: var(--favorite-bg);
+            border-color: var(--favorite-bg);
+            color: white;
+        }
+        #favoriteFilterBtn input:checked ~ .checkmark::after {
+            content: '★';
+            font-weight: bold;
+        }
+        .filter-checkbox.active {
+            background: var(--header-bg);
+            color: white;
+        }
+        [data-theme="dark"] .filter-checkbox.active {
+            background: var(--header-bg);
+        }
+        .clear-all-btn {
+            background: #E0E0E0;
+            color: #333;
+        }
+        [data-theme="dark"] .clear-all-btn {
+            background: #333;
+            color: #EEE;
+        }
+        .clear-all-btn:hover {
+            background: #D0D0D0;
+        }
+        [data-theme="dark"] .clear-all-btn:hover {
+            background: #444;
+        }
         .time-group { margin-bottom: 20px; position: relative; }
         .time-header {
             font-size: 1.2em; font-weight: bold; color: #FFF; background: var(--header-bg);
@@ -122,15 +268,24 @@
         .live { background: var(--live); }
         .upcoming { background: var(--upcoming); }
         .announce { background: var(--announce); }
+        .memorial { background: var(--memorial); }
         .checkbox-overlay, .favorite-overlay {
             position: absolute; top: 8px; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; z-index: 10;
             box-shadow: 0 1px 3px rgba(0,0,0,0.3); transition: all 0.2s;
         }
         .checkbox-overlay { right: 8px; background: rgba(255,255,255,0.3); border: 2px solid rgba(255,255,255,0.6); }
-        .checkbox-overlay.checked { background: var(--check-bg); border-color: var(--check-bg); }
+        .checkbox-overlay.checked { background: var(--check-bg); border-color: var(--check-border); }
         .favorite-overlay { left: 8px; background: rgba(255,255,255,0.4); border: 2px solid var(--favorite-border); display: flex; align-items: center; justify-content: center; }
-        .favorite-overlay::before { content: 'star'; color: transparent; }
-        .favorite-overlay.favorited { background: var(--favorite-bg); color: white !important; }
+        .favorite-overlay::before { content: '★'; color: transparent; }
+        .favorite-overlay.favorited {
+            background: var(--favorite-bg);
+            border-color: var(--favorite-bg);
+            color: white !important;
+        }
+        .favorite-overlay.favorited::before {
+            content: '★';
+            color: white;
+        }
         #checkedPanel {
             position: fixed; top: 70px; right: 20px; width: 340px; background: var(--clock-bg);
             border: 2px solid var(--check-bg); border-radius: 10px; padding: 15px; z-index: 999;
@@ -203,22 +358,44 @@
     </div>
     <div id="toast-container"></div>
     <div class="container">
-<h1 style="margin:0;padding:0;text-align:center;">
-    <img src="https://drive.google.com/thumbnail?id=1L0g9BOCy2OkCuPPqZP1LoqeXQKP-OhRJ&sz=w1200"
-         alt="hololist"
-         class="logo-img">
-</h1>
+        <h1 style="margin:0;padding:0;text-align:center;">
+            <img src="https://drive.google.com/thumbnail?id=1L0g9BOCy2OkCuPPqZP1LoqeXQKP-OhRJ&sz=w1200"
+                 alt="hololist"
+                 class="logo-img">
+        </h1>
         <div class="controls">
             <button onclick="loadSchedule()">更新</button>
             <button onclick="toggleTheme()" id="themeBtn">ダークモード</button>
             <span class="auto-refresh">自動更新: <span id="timer">5:00</span></span>
         </div>
-        <div class="controls">
-            <button class="tab-button active" data-mode="all">すべて</button>
-            <button class="tab-button filter-announce" data-mode="announce">告知枠</button>
-            <button class="tab-button filter-checked" data-mode="checked">チェック済み</button>
-            <button class="tab-button filter-favorite" id="favoriteFilterBtn">推しのみ OFF</button>
-            <button class="tab-button clear-all-btn" onclick="clearAllChecks()">全チェック解除</button>
+        <div class="filter-controls">
+            
+            <label class="filter-checkbox active" data-mode="all">
+                <input type="checkbox" checked>
+                <span class="checkmark"></span>
+                <span>すべて</span>
+            </label>
+            <label class="filter-checkbox" data-mode="announce">
+                <input type="checkbox">
+                <span class="checkmark"></span>
+                <span>告知枠</span>
+            </label>
+            <label class="filter-checkbox" data-mode="memorial">
+                <input type="checkbox">
+                <span class="checkmark"></span>
+                <span>記念枠</span>
+            </label>
+            <label class="filter-checkbox" data-mode="checked">
+                <input type="checkbox">
+                <span class="checkmark"></span>
+                <span>チェック済み</span>
+            </label>
+            <label class="filter-checkbox" id="favoriteFilterBtn">
+                <input type="checkbox">
+                <span class="checkmark"></span>
+                <span>推しのみ OFF</span>
+            </label>
+            <button class="clear-all-btn" onclick="clearAllChecks()">全チェック解除</button>
         </div>
         <div id="content">読み込み中...</div>
     </div>
@@ -230,11 +407,12 @@
         let favoriteChannels = new Set(JSON.parse(localStorage.getItem(FAVORITE_CHANNELS_STORAGE) || '[]'));
         let countdown = 300;
         let autoRefreshTimer;
-        let currentMode = 'all';
         let isFavoriteFilterActive = false;
         const ANNOUNCE_KEYWORDS = ['告知', 'お披露目', '発表', 'デビュー', '新衣装', '重大', '初配信', 'おひろめ'];
+        const MEMORIAL_KEYWORDS = ['周年', '生誕', '爆誕'];
         let notifyEnabled = localStorage.getItem('notifyEnabled') !== 'false';
         const toastContainer = document.getElementById('toast-container');
+
         function updateJSTClock() {
             const now = new Date();
             const jst = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Tokyo"}));
@@ -245,6 +423,7 @@
         }
         updateJSTClock();
         setInterval(updateJSTClock, 1000);
+
         function toggleTheme() {
             const isDark = document.body.getAttribute('data-theme') === 'dark';
             document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
@@ -255,6 +434,7 @@
             document.body.setAttribute('data-theme', 'dark');
             document.getElementById('themeBtn').textContent = 'ライトモード';
         }
+
         function startAutoRefresh() {
             clearInterval(autoRefreshTimer);
             countdown = 300;
@@ -266,6 +446,7 @@
                 if (countdown <= 0) loadSchedule();
             }, 1000);
         }
+
         function updateCheckedPanel() {
             const list = document.getElementById('checkedList');
             const panel = document.getElementById('checkedPanel');
@@ -289,6 +470,7 @@
             list.innerHTML = html;
             panel.style.display = 'block';
         }
+
         function updateHeaderCheckboxes() {
             document.querySelectorAll('.time-group').forEach(group => {
                 const cards = group.querySelectorAll('.stream-card');
@@ -308,6 +490,7 @@
                 }
             });
         }
+
         function toggleTimeGroupCheck(timeKey, el) {
             event.stopPropagation();
             const group = el.closest('.time-group');
@@ -326,8 +509,9 @@
             });
             updateCheckedPanel();
             updateHeaderCheckboxes();
-            applyFilter(currentMode);
+            applyFilter();
         }
+
         async function generateLinkSummary() {
             const checked = document.querySelectorAll('.checkbox-overlay.checked');
             if (checked.length === 0) {
@@ -366,6 +550,7 @@
             outputEl.style.display = 'block';
             copyBtn.style.display = 'block';
         }
+
         function copyToClipboard() {
             const text = document.getElementById('linkOutput').textContent;
             const btn = document.getElementById('copyBtn');
@@ -380,6 +565,7 @@
                 }, 1500);
             });
         }
+
         function toggleCheck(id, el) {
             event.stopPropagation();
             if (checkedVideos.has(id)) {
@@ -392,8 +578,9 @@
             localStorage.setItem(CHECKED_STORAGE, JSON.stringify([...checkedVideos]));
             updateCheckedPanel();
             updateHeaderCheckboxes();
-            applyFilter(currentMode);
+            applyFilter();
         }
+
         function clearAllChecks() {
             if (!confirm('すべて解除しますか？')) return;
             checkedVideos.clear();
@@ -401,10 +588,29 @@
             document.querySelectorAll('.checkbox-overlay').forEach(el => el.classList.remove('checked'));
             updateCheckedPanel();
             updateHeaderCheckboxes();
-            applyFilter(currentMode);
+            applyFilter();
         }
-        function applyFilter(mode = 'all') {
-            currentMode = mode;
+
+        function applyFilter() {
+            const allInput = document.querySelector('.filter-checkbox[data-mode="all"] input');
+            const announceInput = document.querySelector('.filter-checkbox[data-mode="announce"] input');
+            const memorialInput = document.querySelector('.filter-checkbox[data-mode="memorial"] input');
+            const checkedInput = document.querySelector('.filter-checkbox[data-mode="checked"] input');
+            const favoriteInput = document.getElementById('favoriteFilterBtn').querySelector('input');
+
+            const filterAll = allInput.checked;
+            const filterAnnounce = announceInput.checked;
+            const filterMemorial = memorialInput.checked;
+            const filterChecked = checkedInput.checked;
+            const filterFavorite = favoriteInput.checked;
+
+            isFavoriteFilterActive = filterFavorite;
+            document.getElementById('favoriteFilterBtn').querySelector('span:not(.checkmark)').textContent = `推しのみ ${filterFavorite ? 'ON' : 'OFF'}`;
+
+            document.querySelectorAll('.filter-checkbox').forEach(label => {
+                label.classList.toggle('active', label.querySelector('input').checked);
+            });
+
             document.querySelectorAll('.time-group').forEach(group => {
                 const cards = group.querySelectorAll('.stream-card');
                 let visibleCount = 0;
@@ -413,33 +619,50 @@
                     const channelId = card.dataset.channelId;
                     const title = card.querySelector('.stream-title').textContent;
                     const isAnnounce = ANNOUNCE_KEYWORDS.some(kw => title.includes(kw));
+                    const isMemorial = MEMORIAL_KEYWORDS.some(kw => title.includes(kw));
                     const isChecked = checkedVideos.has(videoId);
                     const isFavorite = favoriteChannels.has(channelId);
                     let show = true;
-                    if (isFavoriteFilterActive && !isFavorite) show = false;
-                    if (mode === 'announce' && !isAnnounce) show = false;
-                    if (mode === 'checked' && !isChecked) show = false;
+
+                    if (filterAll) {
+                        show = true;
+                    } else {
+                        show = true;
+                        if (filterAnnounce && !isAnnounce) show = false;
+                        if (filterMemorial && !isMemorial) show = false;
+                        if (filterChecked && !isChecked) show = false;
+                    }
+                    if (filterFavorite && !isFavorite) show = false;
+
                     card.style.display = show ? 'inline-block' : 'none';
                     if (show) visibleCount++;
                 });
                 group.style.display = visibleCount > 0 ? 'block' : 'none';
             });
         }
-        document.querySelectorAll('.tab-button[data-mode]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.tab-button[data-mode]').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                isFavoriteFilterActive = false;
-                document.getElementById('favoriteFilterBtn').textContent = '推しのみ OFF';
-                applyFilter(btn.dataset.mode);
+
+        document.querySelectorAll('.filter-checkbox input').forEach(input => {
+            input.addEventListener('change', function() {
+                const label = this.parentElement;
+                const mode = label.dataset.mode;
+
+                if (mode === 'all') {
+                    if (this.checked) {
+                        document.querySelectorAll('.filter-checkbox input').forEach(cb => {
+                            if (cb !== this) cb.checked = false;
+                        });
+                    }
+                } else {
+                    const allInput = document.querySelector('.filter-checkbox[data-mode="all"] input');
+                    if (allInput.checked) {
+                        allInput.checked = false;
+                    }
+                }
+
+                applyFilter();
             });
         });
-        document.getElementById('favoriteFilterBtn').addEventListener('click', () => {
-            isFavoriteFilterActive = !isFavoriteFilterActive;
-            document.getElementById('favoriteFilterBtn').textContent = `推しのみ ${isFavoriteFilterActive ? 'ON' : 'OFF'}`;
-            document.getElementById('favoriteFilterBtn').classList.toggle('active', isFavoriteFilterActive);
-            applyFilter(currentMode);
-        });
+
         async function loadSchedule() {
             const content = document.getElementById('content');
             content.innerHTML = '<p class="loading">読み込み中...</p>';
@@ -476,8 +699,9 @@
                         const timeStr = new Date(v.available_at).toLocaleString('ja-JP', {hour:'2-digit', minute:'2-digit'});
                         const status = v.status === 'live' ? 'LIVE' : timeStr;
                         const isAnn = ANNOUNCE_KEYWORDS.some(kw => v.title.includes(kw));
-                        const stClass = isAnn ? 'announce' : (v.status === 'live' ? 'live' : 'upcoming');
-                        const stText = isAnn ? '告知' : status;
+                        const isMem = MEMORIAL_KEYWORDS.some(kw => v.title.includes(kw));
+                        const stClass = isMem ? 'memorial' : (isAnn ? 'announce' : (v.status === 'live' ? 'live' : 'upcoming'));
+                        const stText = isMem ? '記念' : (isAnn ? '告知' : status);
                         html += `
                         <div class="stream-card ${fav?'favorite':''}" data-video-id="${v.id}" data-channel-id="${cid}" data-start-time="${startMs}">
                             <div class="thumbnail-wrapper">
@@ -499,12 +723,13 @@
                 content.innerHTML = html || '<p class="no-streams">配信予定なし</p>';
                 updateCheckedPanel();
                 updateHeaderCheckboxes();
-                applyFilter(currentMode);
+                applyFilter();
                 startAutoRefresh();
             } catch (e) {
                 content.innerHTML = `<p class="error">読み込み失敗: ${e.message}</p>`;
             }
         }
+
         function toggleFavorite(id, el) {
             event.stopPropagation();
             if (favoriteChannels.has(id)) {
@@ -518,8 +743,9 @@
             document.querySelectorAll(`.stream-card[data-channel-id="${id}"]`).forEach(c => {
                 c.classList.toggle('favorite', favoriteChannels.has(id));
             });
-            applyFilter(currentMode);
+            applyFilter();
         }
+
         function showToast(message, isLive = false) {
             if ([...toastContainer.children].some(t => t.querySelector('.body')?.textContent === message)) return;
             const toast = document.createElement('div');
@@ -534,12 +760,14 @@
             const timer = setTimeout(() => closeToast(toast.querySelector('.close-btn')), 600000);
             toast.dataset.timer = timer;
         }
+
         function closeToast(btn) {
             const toast = btn.parentElement;
             clearTimeout(toast.dataset.timer);
             toast.classList.remove('show');
             setTimeout(() => toast.remove(), 400);
         }
+
         function checkNotifications() {
             if (!notifyEnabled) return;
             const now = Date.now();
@@ -562,6 +790,7 @@
                 }
             });
         }
+
         const notifyBtn = document.createElement('button');
         notifyBtn.id = 'notifyBtn';
         notifyBtn.textContent = `通知: ${notifyEnabled?'ON':'OFF'}`;
@@ -573,7 +802,9 @@
             localStorage.setItem('notifyEnabled', notifyEnabled);
         };
         document.querySelector('.controls').appendChild(notifyBtn);
+
         setInterval(checkNotifications, 10000);
+
         window.onload = () => {
             loadSchedule();
             startAutoRefresh();
