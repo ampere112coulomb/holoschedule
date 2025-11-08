@@ -299,20 +299,17 @@
             border-color: var(--favorite-bg);
         }
         .favorite-overlay.favorited::before { color: white; }
-        #checkedPanel, #favoritePanel {
-            position: fixed; top: 70px; width: 340px; background: var(--clock-bg);
+        #checkedPanel {
+            position: fixed; top: 70px; right: 20px; width: 340px; background: var(--clock-bg);
             border: 2px solid var(--check-bg); border-radius: 10px; padding: 15px; z-index: 999;
             box-shadow: 0 4px 20px rgba(0,0,0,0.2); font-size: 0.9em; display: none;
         }
-        #favoritePanel { right: 380px; border-color: var(--favorite-bg); }
-        #checkedPanel .header, #favoritePanel .header {
+        #checkedPanel .header {
             display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: bold;
+            color: var(--check-bg);
         }
-        #checkedPanel .header { color: var(--check-bg); }
-        #favoritePanel .header { color: var(--favorite-bg); }
-        #checkedList, #favoriteList { max-height: 220px; overflow-y: auto; margin-bottom: 10px; }
-        #checkedList > div, #favoriteList > div { margin: 6px 0; padding: 8px; background: rgba(76,175,80,0.1); border-radius: 6px; cursor: pointer; }
-        #favoriteList > div { background: rgba(255,193,7,0.1); display: flex; justify-content: space-between; align-items: center; }
+        #checkedList { max-height: 220px; overflow-y: auto; margin-bottom: 10px; }
+        #checkedList > div { margin: 6px 0; padding: 8px; background: rgba(76,175,80,0.1); border-radius: 6px; cursor: pointer; }
         #linkOutput {
             background: #f8f9fa; color: #000; padding: 12px; border-radius: 6px; font-family: monospace;
             white-space: pre-wrap; max-height: 200px; overflow-y: auto; margin-top: 10px; display: none;
@@ -371,7 +368,6 @@
 </head>
 <body>
     <div class="clock" id="jstClock">JST: 00:00:00</div>
-
     <div id="checkedPanel">
         <div class="header">
             <span>チェック済み配信 (<span id="checkedCount">0</span>)</span>
@@ -386,20 +382,7 @@
             コピーする
         </button>
     </div>
-
-    <div id="favoritePanel">
-        <div class="header">
-            <span>推し一覧 (<span id="favCount">0</span>)</span>
-            <button onclick="document.getElementById('favoritePanel').style.display='none'" style="background:none;border:none;font-size:20px;cursor:pointer;color:#AAA;">x</button>
-        </div>
-        <div id="favoriteList"></div>
-        <button onclick="clearAllFavorites()" style="width:100%; padding:8px; background:#FF9800; color:white; border:none; border-radius:6px; cursor:pointer; font-size:0.9em;">
-            すべて解除
-        </button>
-    </div>
-
     <div id="toast-container"></div>
-
     <div class="container">
         <h1 style="margin:0;padding:0;text-align:center;">
             <img src="https://drive.google.com/thumbnail?id=1L0g9BOCy2OkCuPPqZP1LoqeXQKP-OhRJ&sz=w1200"
@@ -443,7 +426,6 @@
         </div>
         <div id="content">読み込み中...</div>
     </div>
-
     <script>
         const API_KEY = 'ffae7804-5730-4ec9-9931-1d31cc52b9d2';
         const CHECKED_STORAGE = 'hololive_checked_videos';
@@ -518,39 +500,6 @@
             });
             list.innerHTML = html;
             panel.style.display = 'block';
-        }
-
-        function updateFavoritePanel() {
-            const list = document.getElementById('favoriteList');
-            const panel = document.getElementById('favoritePanel');
-            const countEl = document.getElementById('favCount');
-            countEl.textContent = favoriteChannels.size;
-            if (favoriteChannels.size === 0) {
-                list.innerHTML = '<div style="text-align:center; color:#999; padding:10px;">推し登録なし</div>';
-                panel.style.display = 'none';
-                return;
-            }
-            let html = '';
-            favoriteChannels.forEach(id => {
-                const channel = [...document.querySelectorAll(`.stream-card[data-channel-id="${id}"]`)].pop();
-                const name = channel ? channel.querySelector('.member-name').textContent : 'Unknown';
-                html += `<div>
-                    <span>${name}</span>
-                    <button onclick="event.stopPropagation(); toggleFavorite('${id}', this)" style="background:none;border:none;color:#F44336;font-size:18px;">×</button>
-                </div>`;
-            });
-            list.innerHTML = html;
-            panel.style.display = 'block';
-        }
-
-        function clearAllFavorites() {
-            if (!confirm('推し登録をすべて解除しますか？')) return;
-            favoriteChannels.clear();
-            localStorage.setItem(FAVORITE_CHANNELS_STORAGE, '[]');
-            document.querySelectorAll('.favorite-overlay').forEach(el => el.classList.remove('favorited'));
-            document.querySelectorAll('.stream-card').forEach(c => c.classList.remove('favorite'));
-            updateFavoritePanel();
-            applyFilter();
         }
 
         function updateHeaderCheckboxes() {
@@ -693,9 +642,11 @@
             const filterFavorite = favoriteInput.checked;
             isFavoriteFilterActive = filterFavorite;
             document.getElementById('favoriteFilterBtn').querySelector('span:not(.checkmark)').textContent = `推しのみ ${filterFavorite ? 'ON' : 'OFF'}`;
+
             document.querySelectorAll('.filter-checkbox').forEach(label => {
                 label.classList.toggle('active', label.querySelector('input').checked);
             });
+
             document.querySelectorAll('.time-group').forEach(group => {
                 const cards = group.querySelectorAll('.stream-card');
                 let visibleCount = 0;
@@ -813,7 +764,6 @@
                 });
                 content.innerHTML = html || '<p class="no-streams">配信予定なし</p>';
                 updateCheckedPanel();
-                updateFavoritePanel();
                 updateHeaderCheckboxes();
                 applyFilter();
                 updateSummary();
@@ -850,7 +800,6 @@
             document.querySelectorAll(`.stream-card[data-channel-id="${id}"]`).forEach(c => {
                 c.classList.toggle('favorite', favoriteChannels.has(id));
             });
-            updateFavoritePanel();
             applyFilter();
         }
 
@@ -919,7 +868,6 @@
             loadSchedule();
             startAutoRefresh();
             updateCheckedPanel();
-            updateFavoritePanel();
             checkNotifications();
         };
     </script>
