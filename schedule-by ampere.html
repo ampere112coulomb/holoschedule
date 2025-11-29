@@ -154,6 +154,7 @@
         <div class="controls">
             <button onclick="loadSchedule()">更新</button>
             <button onclick="toggleTheme()" id="themeBtn">ダークモード</button>
+            <button onclick="window.location.href='https://ampere112coulomb.github.io/holoschedule/schedule-by%20ampere%20-%20mobile.html'">モバイル版</button>
             <input type="text" id="searchInput" class="search-bar" placeholder="タイトル・メンバー名で検索...">
             <span class="auto-refresh">自動更新: <span id="timer">5:00</span></span>
         </div>
@@ -188,7 +189,6 @@
         </div>
         <div id="content">読み込み中...</div>
     </div>
-
     <script>
         const API_KEY = 'ffae7804-5730-4ec9-9931-1d31cc52b9d2';
         const CHECKED_STORAGE = 'hololive_checked_videos';
@@ -202,10 +202,8 @@
         const MEMORIAL_KEYWORDS = ['周年', '生誕', '爆誕'];
         let notifyEnabled = localStorage.getItem('notifyEnabled') !== 'false';
         const toastContainer = document.getElementById('toast-container');
-
         // 通知音を完全に削除（無音化）
         // const notifySound = new Audio('...'); ← コメントアウト＆削除
-
         function updateJSTClock() {
             const now = new Date();
             const jst = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Tokyo"}));
@@ -215,7 +213,6 @@
             document.getElementById('jstClock').textContent = `JST: ${h}:${m}:${s}`;
         }
         updateJSTClock(); setInterval(updateJSTClock, 1000);
-
         function toggleTheme() {
             const isDark = document.body.getAttribute('data-theme') === 'dark';
             document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
@@ -226,7 +223,6 @@
             document.body.setAttribute('data-theme', 'dark');
             document.getElementById('themeBtn').textContent = 'ライトモード';
         }
-
         function startAutoRefresh() {
             clearInterval(autoRefreshTimer);
             countdown = 300;
@@ -238,7 +234,6 @@
                 if (countdown <= 0) loadSchedule();
             }, 1000);
         }
-
         function updateCheckedPanel() {
             const list = document.getElementById('checkedList');
             const panel = document.getElementById('checkedPanel');
@@ -265,7 +260,6 @@
             list.innerHTML = html;
             panel.style.display = 'block';
         }
-
         function updateHeaderCheckboxes() {
             document.querySelectorAll('.time-group').forEach(group => {
                 const visibleCards = group.querySelectorAll('.stream-card:not(.force-hidden-check)');
@@ -285,7 +279,6 @@
                 }
             });
         }
-
         function toggleTimeGroupCheck(timeKey, el) {
             event.stopPropagation();
             const group = el.closest('.time-group');
@@ -306,7 +299,6 @@
             updateHeaderCheckboxes();
             applyFilter();
         }
-
         async function generateLinkSummary() {
             const checked = document.querySelectorAll('.checkbox-overlay.checked');
             if (checked.length === 0) { alert('チェックがありません。'); return; }
@@ -318,7 +310,7 @@
             const groups = {};
             checked.forEach(el => {
                 const card = el.closest('.stream-card');
-                if (!card) return; 
+                if (!card) return;
                 const videoId = card.dataset.videoId;
                 const url = `https://youtu.be/${videoId}`;
                 const member = card.querySelector('.member-name').textContent;
@@ -339,7 +331,6 @@
             outputEl.style.display = 'block';
             copyBtn.style.display = 'block';
         }
-
         function copyToClipboard() {
             const text = document.getElementById('linkOutput').textContent;
             const btn = document.getElementById('copyBtn');
@@ -353,7 +344,6 @@
                 }, 1500);
             });
         }
-
         function toggleCheck(id, el) {
             event.stopPropagation();
             if (checkedVideos.has(id)) {
@@ -368,7 +358,6 @@
             updateHeaderCheckboxes();
             applyFilter();
         }
-
         function clearAllChecks() {
             if (!confirm('すべて解除しますか？')) return;
             checkedVideos.clear();
@@ -378,13 +367,11 @@
             updateHeaderCheckboxes();
             applyFilter();
         }
-
         let searchTimeout;
         document.getElementById('searchInput').addEventListener('input', () => {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(applyFilter, 300);
         });
-
         function applyFilter() {
             const searchText = document.getElementById('searchInput').value.toLowerCase();
             const allInput = document.querySelector('.filter-checkbox[data-mode="all"] input');
@@ -392,19 +379,16 @@
             const memorialInput = document.querySelector('.filter-checkbox[data-mode="memorial"] input');
             const checkedInput = document.querySelector('.filter-checkbox[data-mode="checked"] input');
             const favoriteInput = document.getElementById('favoriteFilterBtn').querySelector('input');
-
             const filterAll = allInput.checked;
             const filterAnnounce = announceInput.checked;
             const filterMemorial = memorialInput.checked;
             const filterChecked = checkedInput.checked;
             const filterFavorite = favoriteInput.checked;
-
             isFavoriteFilterActive = filterFavorite;
             document.getElementById('favoriteFilterBtn').querySelector('span:not(.checkmark)').textContent = `推しのみ ${filterFavorite ? 'ON' : 'OFF'}`;
             document.querySelectorAll('.filter-checkbox').forEach(label => {
                 label.classList.toggle('active', label.querySelector('input').checked);
             });
-
             document.querySelectorAll('.time-group').forEach(group => {
                 const cards = group.querySelectorAll('.stream-card');
                 let visibleCount = 0;
@@ -418,7 +402,6 @@
                     const isChecked = checkedVideos.has(videoId);
                     const isFavorite = favoriteChannels.has(channelId);
                     const matchesSearch = !searchText || title.includes(searchText) || member.includes(searchText);
-
                     let show = matchesSearch;
                     if (!filterAll) {
                         show = matchesSearch;
@@ -427,7 +410,6 @@
                         if (filterChecked && !isChecked) show = false;
                     }
                     if (filterFavorite && !isFavorite) show = false;
-
                     card.style.display = show ? 'inline-block' : 'none';
                     if (show) {
                         card.classList.remove('force-hidden-check');
@@ -438,11 +420,9 @@
                 });
                 group.style.display = visibleCount > 0 ? 'block' : 'none';
             });
-
             updateSummary();
             updateHeaderCheckboxes();
         }
-
         document.querySelectorAll('.filter-checkbox input').forEach(input => {
             input.addEventListener('change', function() {
                 const mode = this.parentElement.dataset.mode;
@@ -454,7 +434,6 @@
                 applyFilter();
             });
         });
-
         async function loadSchedule() {
             const content = document.getElementById('content');
             content.innerHTML = '<p style="text-align:center;padding:40px;">読み込み中...</p>';
@@ -465,7 +444,6 @@
                 if (!res.ok) throw new Error(res.status === 429 ? 'リクエスト多すぎ（しばらく待ってね）' : '読み込み失敗');
                 const videos = await res.json();
                 if (!Array.isArray(videos)) throw new Error('データ形式エラー');
-
                 const groups = {};
                 videos.forEach(v => {
                     const d = new Date(v.available_at);
@@ -473,7 +451,6 @@
                     if (!groups[key]) groups[key] = [];
                     groups[key].push(v);
                 });
-
                 let html = '';
                 Object.keys(groups).sort().forEach(k => {
                     html += `
@@ -523,7 +500,6 @@
                 content.innerHTML = `<div class="error-message"><strong>読み込み失敗</strong><p>${e.message}</p><small>【更新】ボタンで再試行</small></div>`;
             }
         }
-
         function updateSummary() {
             const live = document.querySelectorAll('.status-indicator.live').length;
             const upcoming = document.querySelectorAll('.status-indicator.upcoming').length;
@@ -531,7 +507,6 @@
             document.getElementById('liveCount').textContent = live;
             document.getElementById('upcomingCount').textContent = upcoming;
         }
-
         function toggleFavorite(id, el) {
             event.stopPropagation();
             if (favoriteChannels.has(id)) {
@@ -545,7 +520,6 @@
             document.querySelectorAll(`.stream-card[data-channel-id="${id}"]`).forEach(c => c.classList.toggle('favorite', favoriteChannels.has(id)));
             applyFilter();
         }
-
         function showToast(message, isLive = false) {
             if ([...toastContainer.children].some(t => t.querySelector('.body')?.textContent === message)) return;
             const toast = document.createElement('div');
@@ -563,7 +537,6 @@
             toast.classList.remove('show');
             setTimeout(() => toast.remove(), 400);
         }
-
         function checkNotifications() {
             if (!notifyEnabled) return;
             const now = Date.now();
@@ -586,7 +559,6 @@
                 }
             });
         }
-
         const notifyBtn20 = document.createElement('button');
         notifyBtn20.id = 'notifyBtn';
         notifyBtn20.textContent = `通知: ${notifyEnabled?'ON':'OFF'}`;
@@ -599,7 +571,6 @@
             localStorage.setItem('notifyEnabled', notifyEnabled);
         };
         document.querySelector('.controls').appendChild(notifyBtn20);
-
         setInterval(checkNotifications, 10000);
         window.onload = () => {
             loadSchedule();
