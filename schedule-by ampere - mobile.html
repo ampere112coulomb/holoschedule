@@ -18,16 +18,14 @@
             --announce: #FF6D00;
             --memorial: #FF69B4;
             --check-bg: #4CAF50;
+            --check-border: #43A047;
+            --all-check-bg: #4FC3F7;
             --clock-bg: rgba(255, 255, 255, 0.95);
             --clock-text: #0288D1;
             --favorite-bg: #FFD700;
             --favorite-border: #FFA000;
             --favorite-card-border: #FFC107;
-            --panel-bg: rgba(255,255,255,0.98);
-            --modal-bg: rgba(0,0,0,0.7);
-            --toggle-btn-bg: #4CAF50;
-            --search-bg: #f5f5f5;
-            --search-border: #ddd;
+            --error: #E53935;
         }
         [data-theme="dark"] {
             --bg-gradient: linear-gradient(135deg, #0D47A1, #1A1A1A);
@@ -41,261 +39,154 @@
             --announce: #FF8A65;
             --memorial: #FF8AD4;
             --check-bg: #66BB6A;
+            --check-border: #4CAF50;
+            --all-check-bg: #81D4FA;
             --clock-bg: rgba(30,30,30,0.95);
             --clock-text: #42A5F5;
             --favorite-bg: #FFB300;
             --favorite-border: #FF8F00;
             --favorite-card-border: #FFB300;
-            --panel-bg: rgba(30,30,30,0.98);
-            --modal-bg: rgba(0,0,0,0.8);
-            --toggle-btn-bg: #66BB6A;
-            --search-bg: #333;
-            --search-border: #555;
+            --error: #EF5350;
         }
-        * { box-sizing: border-box; }
-        body {
-            font-family: 'Noto Sans JP', sans-serif;
-            background: var(--bg-gradient);
-            margin: 0;
-            padding: 16px;
-            color: var(--text);
-            min-height: 100vh;
-            position: relative;
-            padding-bottom: 80px;
-        }
-        .clock {
-            position: fixed; top: 12px; left: 12px;
-            background: var(--clock-bg); padding: 8px 12px; border-radius: 8px;
-            box-shadow: 0 2px 8px var(--shadow); font-size: 0.95rem; font-weight: bold;
-            color: var(--clock-text); z-index: 1000; border: 1px solid var(--border);
-        }
-        .container {
-            max-width: 1200px; margin: 0 auto; background: var(--panel-bg);
-            border-radius: 12px; box-shadow: 0 4px 20px var(--shadow); padding: 16px;
-        }
-        .logo-img {
-            width: 100%;
-            max-width: 600px;
-            height: auto;
-            display: block;
-            margin: 0 auto 16px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px var(--shadow);
-        }
-        .controls {
-            display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
-            margin-bottom: 16px; font-size: 0.9rem;
-        }
-        button {
-            padding: 10px 14px; background: var(--header-bg); color: white;
-            border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem;
-            min-width: 80px; white-space: nowrap;
-        }
-        button:hover, button:active { background: #0277BD; }
-        .tab-button { background: #E0E0E0; color: #333; font-weight: 500; }
-        .tab-button.active { background: var(--header-bg); color: white; }
-        [data-theme="dark"] .tab-button { background: #333; color: #EEE; }
-        .filter-announce { background: var(--announce) !important; color: white !important; }
-        .filter-memorial { background: var(--memorial) !important; color: white !important; }
-        .filter-checked { background: var(--check-bg) !important; color: white !important; }
-        .filter-favorite { background: var(--favorite-bg) !important; color: #000 !important; }
-        #toggleCheckedBtn {
-            position: fixed; right: 16px; bottom: 16px; z-index: 998;
-            background: var(--toggle-btn-bg); color: white; padding: 12px 16px;
-            border-radius: 50px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;
-            cursor: pointer; transition: all 0.3s;
-        }
-        #toggleCheckedBtn:hover { transform: scale(1.05); }
-        #toggleCheckedBtn .count {
-            background: rgba(255,255,255,0.3); padding: 2px 8px; border-radius: 12px; font-size: 0.8rem;
-        }
-        .search-bar {
-            padding: 8px 12px;
-            border: 1px solid var(--search-border);
-            border-radius: 6px;
-            background: var(--search-bg);
-            color: var(--text);
-            font-size: 0.9rem;
-            width: 100%;
-            max-width: 300px;
-        }
-        .search-bar::placeholder { color: #999; }
-        .time-group { margin-bottom: 20px; }
-        .time-header {
-            font-size: 1.1rem; font-weight: bold; color: #FFF; background: var(--header-bg);
-            padding: 10px 12px; border-radius: 6px; display: flex;
-            align-items: center; justify-content: space-between;
-        }
-        .header-checkbox {
-            width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
-            background: rgba(255,255,255,0.3); border: 2px solid rgba(255,255,255,0.6);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3); transition: all 0.2s;
-        }
-        .header-checkbox.checked { background: var(--check-bg); border-color: var(--check-bg); }
-        .schedule-container {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 12px; padding: 8px 0;
-        }
-        .stream-card {
-            background: var(--card-bg); border-radius: 10px; overflow: hidden;
-            box-shadow: 0 2px 8px var(--shadow); position: relative;
-            border: 2px solid transparent; transition: transform 0.2s, border 0.2s;
-            display: flex; flex-direction: column;
-        }
-        .stream-card.favorite { border-color: var(--favorite-card-border) !important; }
-        .stream-card:active { transform: scale(0.98); }
-        .thumbnail-wrapper { position: relative; width: 100%; aspect-ratio: 16/9; overflow: hidden; }
-        .thumbnail { width: 100%; height: 100%; object-fit: cover; }
-        .checkbox-overlay, .favorite-overlay {
-            position: absolute; width: 40px; height: 40px; border-radius: 50%;
-            cursor: pointer; z-index: 10; box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-            transition: all 0.2s; top: 8px;
-        }
-        .checkbox-overlay { right: 8px; background: rgba(255,255,255,0.4); border: 3px solid rgba(255,255,255,0.7); }
-        .checkbox-overlay.checked { background: var(--check-bg); border-color: var(--check-bg); }
-        .favorite-overlay {
-            left: 8px; background: rgba(255,255,255,0.5); border: 3px solid var(--favorite-border);
-            display: flex; align-items: center; justify-content: center; font-size: 20px;
-        }
-        .favorite-overlay::before {
-            content: ''; /* 文字なし */
-        }
-        .favorite-overlay.favorited {
-            background: var(--favorite-bg);
-        }
-        .favorite-overlay.favorited::before {
-            content: '★';
-            color: white;
-        }
-        .stream-info { padding: 10px; flex: 1; display: flex; flex-direction: column; }
-        .member-name { font-size: 1.05rem; font-weight: bold; color: var(--header-bg); margin-bottom: 4px; }
-        .stream-title { font-size: 0.9rem; color: #555; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; flex: 1; }
-        [data-theme="dark"] .stream-title { color: #CCC; }
-        .status-indicator {
-            position: absolute; bottom: 8px; right: 8px; padding: 4px 10px;
-            border-radius: 6px; color: white; font-size: 0.8rem; font-weight: bold;
-        }
-        .live { background: var(--live); }
-        .upcoming { background: var(--upcoming); }
-        .announce { background: var(--announce); }
-        .memorial { background: var(--memorial); }
-        #checkedPanel {
-            position: fixed; bottom: 80px; right: 16px; width: 340px; background: var(--panel-bg);
-            border: 2px solid var(--check-bg); border-radius: 12px; padding: 16px;
-            z-index: 997; box-shadow: 0 8px 25px rgba(0,0,0,0.3); max-height: 60vh;
-            overflow-y: auto; transform: translateX(120%); transition: transform 0.3s ease;
-            display: none;
-        }
-        #checkedPanel.show {
-            transform: translateX(0); display: block;
-        }
-        #checkedPanel .header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 12px; font-weight: bold; color: var(--check-bg); font-size: 1.1rem;
-        }
-        #checkedList > div {
-            margin: 6px 0; padding: 10px; background: rgba(76,175,80,0.1);
-            border-radius: 8px; font-size: 0.9rem;
-        }
-        #linkModal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--modal-bg); z-index: 1001; display: none;
-            align-items: center; justify-content: center; padding: 16px;
-        }
-        #linkModal.show { display: flex; }
-        .modal-content {
-            background: var(--panel-bg); border-radius: 12px; width: 100%;
-            max-width: 500px; max-height: 80vh; overflow-y: auto;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.3); padding: 16px;
-        }
-        .modal-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 12px; font-weight: bold; font-size: 1.1rem;
-        }
-        #linkOutput {
-            background: #f8f9fa; color: #000; padding: 12px; border-radius: 6px;
-            font-family: monospace; white-space: pre-wrap; font-size: 0.85rem;
-            border: 1px solid #ddd; max-height: 300px; overflow-y: auto;
-        }
-        [data-theme="dark"] #linkOutput { background: #333; color: #EEE; border-color: #555; }
-        #toast-container {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            z-index: 9999; display: flex; flex-direction: column; gap: 10px;
-            align-items: center; max-width: 90vw;
-        }
-        .notification-toast {
-            min-width: 280px; max-width: 380px; background: #1E1E1E; color: #FFF;
-            border-radius: 8px; box-shadow: 0 8px 25px rgba(0,0,0,0.4); padding: 14px;
-            font-family: 'Segoe UI','Noto Sans JP',sans-serif; border-left: 4px solid #00B7EB;
-            opacity: 0; transform: translateY(20px);
-            transition: all 0.4s cubic-bezier(0.25,0.8,0.25,1);
-        }
-        .notification-toast.show { opacity: 1; transform: translateY(0); }
-        .notification-toast.live { border-left-color: #E53935; }
-        .notification-toast .close-btn {
-            position: absolute; top: 6px; right: 10px; background: none; border: none;
-            color: #AAA; font-size: 18px; cursor: pointer; padding: 0;
-        }
-        .notification-toast .title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
-        .notification-toast .body { font-size: 13px; line-height: 1.4; color: #DDD; }
-        @media (max-width: 480px) {
-            #toggleCheckedBtn { right: 12px; bottom: 12px; padding: 10px 14px; font-size: 0.85rem; }
-            #checkedPanel { width: calc(100% - 32px); right: 16px; }
-            .search-bar { max-width: 100%; }
-        }
+        body {font-family:'Noto Sans JP',sans-serif;background:var(--bg-gradient);margin:0;padding:20px;color:var(--text);position:relative;}
+        .clock {position:fixed;top:20px;right:20px;background:var(--clock-bg);padding:10px 15px;border-radius:8px;box-shadow:0 2px 10px var(--shadow);font-weight:bold;color:var(--clock-text);z-index:1000;border:1px solid var(--border);}
+        .container {max-width:1200px;margin:0 auto;background:rgba(255,255,255,0.98);border-radius:12px;box-shadow:0 4px 20px var(--shadow);padding:20px;}
+        [data-theme="dark"] .container {background:rgba(30,30,30,0.98);}
+        .logo-img {width:600px;max-width:100%;height:auto;display:block;margin:0 auto 20px;border-radius:8px;box-shadow:0 2px 8px var(--shadow);}
+        .controls {display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:20px;align-items:center;}
+        button {padding:8px 16px;background:var(--header-bg);color:white;border:none;border-radius:4px;cursor:pointer;}
+        button:hover {background:#0277BD;}
+        .search-bar {padding:8px 12px;border:1px solid #ccc;border-radius:4px;width:250px;font-size:1em;}
+        [data-theme="dark"] .search-bar {background:#333;color:#EEE;border-color:#555;}
+        .summary {text-align:center;font-size:1.1em;margin:10px 0;color:var(--header-bg);}
+        .filter-controls {display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:20px;}
+        .filter-checkbox {display:flex;align-items:center;padding:8px 16px;background:#E0E0E0;color:#333;border-radius:4px;cursor:pointer;user-select:none;font-weight:bold;position:relative;transition:background .2s;}
+        [data-theme="dark"] .filter-checkbox {background:#333;color:#EEE;}
+        .filter-checkbox:hover {background:#D0D0D0;}
+        [data-theme="dark"] .filter-checkbox:hover {background:#444;}
+        .filter-checkbox input {position:absolute;opacity:0;cursor:pointer;height:0;width:0;}
+        .filter-checkbox .checkmark {width:24px;height:24px;background:rgba(255,255,255,0.3);border:2px solid rgba(255,255,255,0.6);border-radius:50%;margin-right:8px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,0.3);transition:all .2s;font-size:14px;color:transparent;}
+        .filter-checkbox input:checked ~ .checkmark {background:var(--check-bg);border-color:var(--check-bg);color:white;}
+        .filter-checkbox input:checked ~ .checkmark::after {content:'✓';font-weight:bold;}
+        .filter-checkbox[data-mode="all"] input:checked ~ .checkmark {background:var(--all-check-bg);border-color:var(--all-check-bg);}
+        .filter-checkbox[data-mode="announce"] .checkmark {border-color:var(--announce);}
+        .filter-checkbox[data-mode="announce"] input:checked ~ .checkmark {background:var(--announce);border-color:var(--announce);}
+        .filter-checkbox[data-mode="memorial"] .checkmark {border-color:var(--memorial);}
+        .filter-checkbox[data-mode="memorial"] input:checked ~ .checkmark {background:var(--memorial);border-color:var(--memorial);color:white;}
+        .filter-checkbox[data-mode="checked"] .checkmark {border-color:var(--check-border);}
+        .filter-checkbox[data-mode="checked"] input:checked ~ .checkmark {background:var(--check-bg);border-color:var(--check-border);color:white;}
+        #favoriteFilterBtn .checkmark {border-color:var(--favorite-border);}
+        #favoriteFilterBtn input:checked ~ .checkmark {background:var(--favorite-bg);border-color:var(--favorite-bg);color:white;}
+        #favoriteFilterBtn input:checked ~ .checkmark::after {content:'★';font-weight:bold;}
+        .filter-checkbox.active {background:var(--header-bg);color:white;}
+        [data-theme="dark"] .filter-checkbox.active {background:var(--header-bg);}
+        .clear-all-btn {background:#E0E0E0;color:#333;}
+        [data-theme="dark"] .clear-all-btn {background:#333;color:#EEE;}
+        .clear-all-btn:hover {background:#D0D0D0;}
+        [data-theme="dark"] .clear-all-btn:hover {background:#444;}
+        .time-group {margin-bottom:20px;position:relative;}
+        .time-header {font-size:1.2em;font-weight:bold;color:#FFF;background:var(--header-bg);padding:10px;border-radius:4px;display:flex;align-items:center;justify-content:space-between;}
+        .time-header span {flex:1;}
+        .header-checkbox {width:24px;height:24px;border-radius:50%;cursor:pointer;background:rgba(255,255,255,0.3);border:2px solid rgba(255,255,255,0.6);box-shadow:0 1px 3px rgba(0,0,0,0.3);transition:all .2s;margin-left:10px;flex-shrink:0;}
+        .header-checkbox.checked {background:var(--check-bg);border-color:var(--check-bg);}
+        .schedule-container {overflow-x:auto;white-space:nowrap;padding-bottom:10px;}
+        .stream-card {display:inline-block;width:280px;margin-right:15px;background:var(--card-bg);border-radius:8px;overflow:hidden;box-shadow:0 2px 5px var(--shadow);position:relative;border:2px solid transparent;transition:transform .2s;}
+        .stream-card.favorite {border-color:var(--favorite-card-border)!important;}
+        .stream-card:hover {transform:translateY(-3px);}
+        .thumbnail {width:100%;aspect-ratio:16/9;object-fit:cover;}
+        .stream-info {padding:10px;position:relative;}
+        .member-name {font-size:1.1em;font-weight:bold;color:var(--header-bg);}
+        .stream-title {font-size:0.9em;color:#555;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+        [data-theme="dark"] .stream-title {color:#CCC;}
+        .status-indicator {position:absolute;bottom:10px;right:10px;padding:5px 10px;border-radius:4px;color:white;font-size:0.8em;font-weight:bold;}
+        .live {background:var(--live);}
+        .upcoming {background:var(--upcoming);}
+        .announce {background:var(--announce);}
+        .memorial {background:var(--memorial);}
+        .checkbox-overlay,.favorite-overlay {position:absolute;width:32px;height:32px;border-radius:50%;cursor:pointer;z-index:10;box-shadow:0 1px 3px rgba(0,0,0,0.3);transition:all .2s;display:flex;align-items:center;justify-content:center;font-size:18px;}
+        .checkbox-overlay {top:8px;right:8px;background:rgba(255,255,255,0.3);border:2px solid rgba(255,255,255,0.6);}
+        .checkbox-overlay.checked {background:var(--check-bg);border-color:var(--check-border);}
+        .favorite-overlay {top:8px;left:8px;background:rgba(255,255,255,0.4);border:2px solid var(--favorite-border);}
+        .favorite-overlay::before {content:'★';color:transparent;}
+        .favorite-overlay.favorited {background:var(--favorite-bg);border-color:var(--favorite-bg);}
+        .favorite-overlay.favorited::before {color:white;}
+        .stream-card[style*="display: none"] .checkbox-overlay,
+        .stream-card.force-hidden-check .checkbox-overlay {display:none!important;}
+        #checkedPanel {position:fixed;top:70px;right:20px;width:340px;background:var(--clock-bg);border:2px solid var(--check-bg);border-radius:10px;padding:15px;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,0.2);font-size:0.9em;display:none;}
+        #checkedPanel .header {display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-weight:bold;color:var(--check-bg);}
+        #checkedList {max-height:220px;overflow-y:auto;margin-bottom:10px;}
+        #checkedList > div {margin:6px 0;padding:8px;background:rgba(76,175,80,0.1);border-radius:6px;cursor:pointer;}
+        #linkOutput {background:#f8f9fa;color:#000;padding:12px;border-radius:6px;font-family:monospace;white-space:pre-wrap;max-height:200px;overflow-y:auto;margin-top:10px;display:none;border:1px solid #ddd;}
+        [data-theme="dark"] #linkOutput {background:#333;color:#EEE;border-color:#555;}
+        #toast-container {position:fixed;right:20px;bottom:20px;z-index:9999;display:flex;flex-direction:column;gap:12px;align-items:flex-end;}
+        .notification-toast {min-width:320px;max-width:400px;background:#1E1E1E;color:#FFF;border-radius:8px;box-shadow:0 8px 25px rgba(0,0,0,0.4);padding:16px;font-family:'Segoe UI','Noto Sans JP',sans-serif;border-left:4px solid #00B7EB;opacity:0;transform:translateY(20px);transition:all .4s cubic-bezier(0.25,0.8,0.25,1);}
+        .notification-toast.show {opacity:1;transform:translateY(0);}
+        .notification-toast.live {border-left-color:#E53935;}
+        .notification-toast .close-btn {position:absolute;top:8px;right:12px;background:none;border:none;color:#AAA;font-size:20px;cursor:pointer;padding:0;width:24px;height:24px;line-height:24px;}
+        .notification-toast .close-btn:hover {color:#FFF;}
+        .notification-toast .title {font-weight:600;font-size:15px;margin-bottom:6px;}
+        .notification-toast .body {font-size:14px;line-height:1.4;color:#DDD;}
+        .error-message {text-align:center;color:var(--error);font-weight:bold;padding:20px;background:rgba(255,0,0,0.05);border-radius:8px;margin:20px 0;}
+        [data-theme="dark"] .error-message {background:rgba(255,0,0,0.15);}
     </style>
 </head>
 <body>
     <div class="clock" id="jstClock">JST: 00:00:00</div>
-    <div id="toggleCheckedBtn" onclick="toggleCheckedPanel()">
-        <span>チェック済み</span>
-        <span class="count" id="checkedCount">0</span>
-    </div>
     <div id="checkedPanel">
         <div class="header">
-            <span>チェック済み配信</span>
-            <button onclick="toggleCheckedPanel()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#AAA;">x</button>
+            <span>チェック済み配信 (<span id="checkedCount">0</span>)</span>
+            <button onclick="document.getElementById('checkedPanel').style.display='none'" style="background:none;border:none;font-size:20px;cursor:pointer;color:#AAA;">x</button>
         </div>
         <div id="checkedList"></div>
-        <button onclick="openLinkModal()" style="width:100%; padding:12px; background:#4CAF50; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold; font-size:0.95rem;">
+        <button onclick="generateLinkSummary()" style="width:100%;padding:10px;background:#4CAF50;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:bold;">
             配信リンクまとめを作成
         </button>
-    </div>
-    <div id="linkModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span>同時視聴リンク</span>
-                <button onclick="closeLinkModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#AAA;">x</button>
-            </div>
-            <div id="linkOutput"></div>
-            <button onclick="copyToClipboard()" id="copyBtn" style="width:100%; margin-top:12px; padding:12px; background:#2196F3; color:white; border:none; border-radius:8px; cursor:pointer; font-size:0.95rem;">
-                コピーする
-            </button>
-        </div>
+        <div id="linkOutput"></div>
+        <button onclick="copyToClipboard()" id="copyBtn" style="width:100%;margin-top:8px;padding:10px;background:#2196F3;color:white;border:none;border-radius:6px;cursor:pointer;display:none;">
+            コピーする
+        </button>
     </div>
     <div id="toast-container"></div>
     <div class="container">
         <h1 style="margin:0;padding:0;text-align:center;">
-            <img src="https://drive.google.com/thumbnail?id=1L0g9BOCy2OkCuPPqZP1LoqeXQKP-OhRJ&sz=w1200"
-                 alt="hololist"
-                 class="logo-img">
+            <img src="https://drive.google.com/thumbnail?id=1L0g9BOCy2OkCuPPqZP1LoqeXQKP-OhRJ&sz=w1200" alt="hololist" class="logo-img">
         </h1>
         <div class="controls">
             <button onclick="loadSchedule()">更新</button>
             <button onclick="toggleTheme()" id="themeBtn">ダークモード</button>
+            <button onclick="window.location.href='https://ampere112coulomb.github.io/holoschedule/schedule-by%20ampere%20-%20mobile.html'">モバイル版</button>
+            <button onclick="window.location.href='https://ampere112coulomb.github.io/holoschedule/schedule-by%20ampere.html'">PC版</button>
             <input type="text" id="searchInput" class="search-bar" placeholder="タイトル・メンバー名で検索...">
-            <span style="display:flex;align-items:center;gap:4px;font-size:0.9rem;">
-                自動更新: <span id="timer">5:00</span>
-            </span>
+            <span class="auto-refresh">自動更新: <span id="timer">5:00</span></span>
         </div>
-        <div class="controls">
-            <button class="tab-button active" data-mode="all">すべて</button>
-            <button class="tab-button filter-announce" data-mode="announce">告知枠</button>
-            <button class="tab-button filter-memorial" data-mode="memorial">記念枠</button>
-            <button class="tab-button filter-checked" data-mode="checked">チェック済み</button>
-            <button class="tab-button filter-favorite" id="favoriteFilterBtn">推しのみ OFF</button>
-            <button class="tab-button" onclick="clearAllChecks()">全チェック解除</button>
+        <div class="summary" id="summary">今日の配信: <strong id="todayCount">0</strong>本（LIVE: <span id="liveCount">0</span> | 予定: <span id="upcomingCount">0</span>）</div>
+        <div class="filter-controls">
+            <label class="filter-checkbox active" data-mode="all">
+                <input type="checkbox" checked>
+                <span class="checkmark"></span>
+                <span>すべて</span>
+            </label>
+            <label class="filter-checkbox" data-mode="announce">
+                <input type="checkbox">
+                <span class="checkmark"></span>
+                <span>告知枠</span>
+            </label>
+            <label class="filter-checkbox" data-mode="memorial">
+                <input type="checkbox">
+                <span class="checkmark"></span>
+                <span>記念枠</span>
+            </label>
+            <label class="filter-checkbox" data-mode="checked">
+                <input type="checkbox">
+                <span class="checkmark"></span>
+                <span>チェック済み</span>
+            </label>
+            <label class="filter-checkbox" id="favoriteFilterBtn">
+                <input type="checkbox">
+                <span class="checkmark"></span>
+                <span>推しのみ OFF</span>
+            </label>
+            <button class="clear-all-btn" onclick="clearAllChecks()">全チェック解除</button>
         </div>
         <div id="content">読み込み中...</div>
     </div>
@@ -307,13 +198,13 @@
         let favoriteChannels = new Set(JSON.parse(localStorage.getItem(FAVORITE_CHANNELS_STORAGE) || '[]'));
         let countdown = 300;
         let autoRefreshTimer;
-        let currentMode = 'all';
         let isFavoriteFilterActive = false;
-        let searchText = '';
-        const ANNOUNCE_KEYWORDS = ['告知', 'お披露目', '発表', '新衣装', '続報', '重大', 'おひろめ'];
+        const ANNOUNCE_KEYWORDS = ['告知', 'お披露目', '発表', '新衣装', '重大', 'おひろめ'];
         const MEMORIAL_KEYWORDS = ['周年', '生誕', '爆誕'];
         let notifyEnabled = localStorage.getItem('notifyEnabled') !== 'false';
         const toastContainer = document.getElementById('toast-container');
+        // 通知音を完全に削除（無音化）
+        // const notifySound = new Audio('...'); ← コメントアウト＆削除
         function updateJSTClock() {
             const now = new Date();
             const jst = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Tokyo"}));
@@ -322,8 +213,7 @@
             const s = String(jst.getSeconds()).padStart(2, '0');
             document.getElementById('jstClock').textContent = `JST: ${h}:${m}:${s}`;
         }
-        updateJSTClock();
-        setInterval(updateJSTClock, 1000);
+        updateJSTClock(); setInterval(updateJSTClock, 1000);
         function toggleTheme() {
             const isDark = document.body.getAttribute('data-theme') === 'dark';
             document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
@@ -347,47 +237,43 @@
         }
         function updateCheckedPanel() {
             const list = document.getElementById('checkedList');
+            const panel = document.getElementById('checkedPanel');
             const countEl = document.getElementById('checkedCount');
             const checked = document.querySelectorAll('.checkbox-overlay.checked');
-            const count = checked.length;
-            countEl.textContent = count;
-            if (count === 0) {
-                list.innerHTML = '<p style="text-align:center;color:#999;font-size:0.9rem;">チェックなし</p>';
+            countEl.textContent = checked.length;
+            if (checked.length === 0) {
+                panel.style.display = 'none';
+                document.getElementById('linkOutput').style.display = 'none';
+                document.getElementById('copyBtn').style.display = 'none';
                 return;
             }
             let html = '';
             checked.forEach(el => {
                 const card = el.closest('.stream-card');
-                if (!card) return;
-                const member = card.querySelector('.member-name')?.textContent || 'Unknown';
-                const title = card.querySelector('.stream-title')?.textContent || '';
+                const member = card.querySelector('.member-name').textContent;
+                const title = card.querySelector('.stream-title').textContent;
                 const time = new Date(parseInt(card.dataset.startTime)).toLocaleString('ja-JP', {hour:'2-digit', minute:'2-digit'});
-                html += `<div><strong>${member}</strong><br><small>${time} ~ ${title.slice(0,25)}${title.length>25?'...':''}</small></div>`;
+                html += `<div onclick="document.querySelector('.stream-card[data-video-id=\\'${card.dataset.videoId}\\']').scrollIntoView({behavior:'smooth',block:'center'})">
+                    <strong>${member}</strong><br>
+                    <small>${time} ~ ${title.slice(0,25)}${title.length>25?'...':''}</small>
+                </div>`;
             });
             list.innerHTML = html;
-        }
-        function toggleCheckedPanel() {
-            const panel = document.getElementById('checkedPanel');
-            const isShown = panel.classList.contains('show');
-            if (isShown) {
-                panel.classList.remove('show');
-                setTimeout(() => panel.style.display = 'none', 300);
-            } else {
-                updateCheckedPanel();
-                panel.style.display = 'block';
-                setTimeout(() => panel.classList.add('show'), 10);
-            }
+            panel.style.display = 'block';
         }
         function updateHeaderCheckboxes() {
             document.querySelectorAll('.time-group').forEach(group => {
-                const cards = group.querySelectorAll('.stream-card');
+                const visibleCards = group.querySelectorAll('.stream-card:not(.force-hidden-check)');
                 const headerCheck = group.querySelector('.header-checkbox');
-                if (!headerCheck || cards.length === 0) return;
-                const videoIds = Array.from(cards).map(c => c.dataset.videoId);
-                const allChecked = videoIds.every(id => checkedVideos.has(id));
-                const someChecked = videoIds.some(id => checkedVideos.has(id));
+                if (!headerCheck || visibleCards.length === 0) return;
+                let checkedCount = 0;
+                visibleCards.forEach(card => {
+                    if (checkedVideos.has(card.dataset.videoId)) checkedCount++;
+                });
+                const allChecked = checkedCount === visibleCards.length;
+                const someChecked = checkedCount > 0 && !allChecked;
                 headerCheck.classList.toggle('checked', allChecked || someChecked);
-                if (someChecked && !allChecked) {
+                if (someChecked) {
                     headerCheck.style.background = 'linear-gradient(to right, var(--check-bg) 50%, rgba(255,255,255,0.3) 50%)';
                 } else {
                     headerCheck.style.background = allChecked ? 'var(--check-bg)' : 'rgba(255,255,255,0.3)';
@@ -397,27 +283,26 @@
         function toggleTimeGroupCheck(timeKey, el) {
             event.stopPropagation();
             const group = el.closest('.time-group');
-            const cards = group.querySelectorAll('.stream-card:not([style*="display: none"])');
-            if (cards.length === 0) return;
+            const cards = group.querySelectorAll('.stream-card:not(.force-hidden-check)');
             const videoIds = Array.from(cards).map(c => c.dataset.videoId);
             const allChecked = videoIds.every(id => checkedVideos.has(id));
-            const newState = !allChecked;
-            videoIds.forEach(id => {
-                if (newState) checkedVideos.add(id);
-                else checkedVideos.delete(id);
-            });
+            if (allChecked) {
+                videoIds.forEach(id => checkedVideos.delete(id));
+            } else {
+                videoIds.forEach(id => checkedVideos.add(id));
+            }
             localStorage.setItem(CHECKED_STORAGE, JSON.stringify([...checkedVideos]));
             cards.forEach(card => {
                 const overlay = card.querySelector('.checkbox-overlay');
-                if (overlay) overlay.classList.toggle('checked', newState);
+                if (overlay) overlay.classList.toggle('checked', !allChecked);
             });
             updateCheckedPanel();
             updateHeaderCheckboxes();
-            applyFilter(currentMode);
+            applyFilter();
         }
-        function openLinkModal() {
+        async function generateLinkSummary() {
             const checked = document.querySelectorAll('.checkbox-overlay.checked');
-            if (checked.length === 0) return alert('チェックがありません！');
+            if (checked.length === 0) { alert('チェックがありません。'); return; }
             const title = prompt('タイトルを入力（空欄OK）', '');
             if (title === null) return;
             const viewText = prompt('例：視点 / 配信 / 枠 / 部屋 (空欄OK)', '');
@@ -426,14 +311,12 @@
             const groups = {};
             checked.forEach(el => {
                 const card = el.closest('.stream-card');
+                if (!card) return;
                 const videoId = card.dataset.videoId;
                 const url = `https://youtu.be/${videoId}`;
                 const member = card.querySelector('.member-name').textContent;
                 const date = new Date(parseInt(card.dataset.startTime));
-                const key = date.toLocaleDateString('ja-JP', {
-                    month: 'numeric', day: 'numeric',
-                    hour: '2-digit', minute: '2-digit'
-                }).replace(/\/(\d)\//g, '/0$1/');
+                const key = date.toLocaleDateString('ja-JP', {month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}).replace(/\/(\d)\//g, '/0$1/');
                 if (!groups[key]) groups[key] = [];
                 groups[key].push({member, url});
             });
@@ -443,35 +326,38 @@
                     output += `■${time} ~ ${item.member}${view}\n${item.url}\n\n`;
                 });
             });
-            document.getElementById('linkOutput').textContent = output.trim();
-            document.getElementById('linkModal').classList.add('show');
-        }
-        function closeLinkModal() {
-            document.getElementById('linkModal').classList.remove('show');
+            const outputEl = document.getElementById('linkOutput');
+            const copyBtn = document.getElementById('copyBtn');
+            outputEl.textContent = output.trim();
+            outputEl.style.display = 'block';
+            copyBtn.style.display = 'block';
         }
         function copyToClipboard() {
             const text = document.getElementById('linkOutput').textContent;
+            const btn = document.getElementById('copyBtn');
+            const originalText = btn.textContent;
             navigator.clipboard.writeText(text).then(() => {
-                const btn = document.getElementById('copyBtn');
-                const orig = btn.textContent;
                 btn.textContent = 'コピー完了！';
                 btn.style.background = '#4CAF50';
                 setTimeout(() => {
-                    btn.textContent = orig;
+                    btn.textContent = originalText;
                     btn.style.background = '#2196F3';
                 }, 1500);
             });
         }
         function toggleCheck(id, el) {
             event.stopPropagation();
-            const has = checkedVideos.has(id);
-            if (has) checkedVideos.delete(id);
-            else checkedVideos.add(id);
-            el.classList.toggle('checked', !has);
+            if (checkedVideos.has(id)) {
+                checkedVideos.delete(id);
+                el.classList.remove('checked');
+            } else {
+                checkedVideos.add(id);
+                el.classList.add('checked');
+            }
             localStorage.setItem(CHECKED_STORAGE, JSON.stringify([...checkedVideos]));
             updateCheckedPanel();
             updateHeaderCheckboxes();
-            applyFilter(currentMode);
+            applyFilter();
         }
         function clearAllChecks() {
             if (!confirm('すべて解除しますか？')) return;
@@ -480,18 +366,30 @@
             document.querySelectorAll('.checkbox-overlay').forEach(el => el.classList.remove('checked'));
             updateCheckedPanel();
             updateHeaderCheckboxes();
-            applyFilter(currentMode);
+            applyFilter();
         }
         let searchTimeout;
-        document.getElementById('searchInput').addEventListener('input', function() {
+        document.getElementById('searchInput').addEventListener('input', () => {
             clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                searchText = this.value.toLowerCase().trim();
-                applyFilter(currentMode);
-            }, 300);
+            searchTimeout = setTimeout(applyFilter, 300);
         });
-        function applyFilter(mode = 'all') {
-            currentMode = mode;
+        function applyFilter() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            const allInput = document.querySelector('.filter-checkbox[data-mode="all"] input');
+            const announceInput = document.querySelector('.filter-checkbox[data-mode="announce"] input');
+            const memorialInput = document.querySelector('.filter-checkbox[data-mode="memorial"] input');
+            const checkedInput = document.querySelector('.filter-checkbox[data-mode="checked"] input');
+            const favoriteInput = document.getElementById('favoriteFilterBtn').querySelector('input');
+            const filterAll = allInput.checked;
+            const filterAnnounce = announceInput.checked;
+            const filterMemorial = memorialInput.checked;
+            const filterChecked = checkedInput.checked;
+            const filterFavorite = favoriteInput.checked;
+            isFavoriteFilterActive = filterFavorite;
+            document.getElementById('favoriteFilterBtn').querySelector('span:not(.checkmark)').textContent = `推しのみ ${filterFavorite ? 'ON' : 'OFF'}`;
+            document.querySelectorAll('.filter-checkbox').forEach(label => {
+                label.classList.toggle('active', label.querySelector('input').checked);
+            });
             document.querySelectorAll('.time-group').forEach(group => {
                 const cards = group.querySelectorAll('.stream-card');
                 let visibleCount = 0;
@@ -506,41 +404,47 @@
                     const isFavorite = favoriteChannels.has(channelId);
                     const matchesSearch = !searchText || title.includes(searchText) || member.includes(searchText);
                     let show = matchesSearch;
-                    if (isFavoriteFilterActive && !isFavorite) show = false;
-                    if (mode === 'announce' && !isAnnounce) show = false;
-                    if (mode === 'memorial' && !isMemorial) show = false;
-                    if (mode === 'checked' && !isChecked) show = false;
-                    card.style.display = show ? 'flex' : 'none';
+                    if (!filterAll) {
+                        show = matchesSearch;
+                        if (filterAnnounce && !isAnnounce) show = false;
+                        if (filterMemorial && !isMemorial) show = false;
+                        if (filterChecked && !isChecked) show = false;
+                    }
+                    if (filterFavorite && !isFavorite) show = false;
+                    card.style.display = show ? 'inline-block' : 'none';
+                    if (show) {
+                        card.classList.remove('force-hidden-check');
+                    } else {
+                        card.classList.add('force-hidden-check');
+                    }
                     if (show) visibleCount++;
                 });
                 group.style.display = visibleCount > 0 ? 'block' : 'none';
             });
+            updateSummary();
+            updateHeaderCheckboxes();
         }
-        document.querySelectorAll('.tab-button[data-mode]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.tab-button[data-mode]').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                isFavoriteFilterActive = false;
-                document.getElementById('favoriteFilterBtn').textContent = '推しのみ OFF';
-                document.getElementById('favoriteFilterBtn').classList.remove('active');
-                applyFilter(btn.dataset.mode);
+        document.querySelectorAll('.filter-checkbox input').forEach(input => {
+            input.addEventListener('change', function() {
+                const mode = this.parentElement.dataset.mode;
+                if (mode === 'all' && this.checked) {
+                    document.querySelectorAll('.filter-checkbox input').forEach(cb => { if (cb !== this) cb.checked = false; });
+                } else if (mode !== 'all') {
+                    document.querySelector('.filter-checkbox[data-mode="all"] input').checked = false;
+                }
+                applyFilter();
             });
-        });
-        document.getElementById('favoriteFilterBtn').addEventListener('click', () => {
-            isFavoriteFilterActive = !isFavoriteFilterActive;
-            document.getElementById('favoriteFilterBtn').textContent = `推しのみ ${isFavoriteFilterActive ? 'ON' : 'OFF'}`;
-            document.getElementById('favoriteFilterBtn').classList.toggle('active', isFavoriteFilterActive);
-            applyFilter(currentMode);
         });
         async function loadSchedule() {
             const content = document.getElementById('content');
-            content.innerHTML = '<p class="loading">読み込み中...</p>';
+            content.innerHTML = '<p style="text-align:center;padding:40px;">読み込み中...</p>';
             try {
                 const res = await fetch('https://holodex.net/api/v2/live?org=Hololive&status=live,upcoming&limit=100', {
                     headers: { 'X-APIKEY': API_KEY }
                 });
-                if (!res.ok) throw new Error('APIエラー: ' + res.status);
+                if (!res.ok) throw new Error(res.status === 429 ? 'リクエスト多すぎ（しばらく待ってね）' : '読み込み失敗');
                 const videos = await res.json();
+                if (!Array.isArray(videos)) throw new Error('データ形式エラー');
                 const groups = {};
                 videos.forEach(v => {
                     const d = new Date(v.available_at);
@@ -553,31 +457,31 @@
                     html += `
                     <div class="time-group">
                         <div class="time-header">
-                            <span>${k}</span>
+                            <span>${k.replace(/(\d{4})-(\d{2})-(\d{2}) (\d{2}):00/, '$1/$2/$3 $4:00')}</span>
                             <div class="header-checkbox" onclick="toggleTimeGroupCheck('${k}', this)"></div>
                         </div>
                         <div class="schedule-container">`;
                     groups[k].forEach(v => {
                         const cid = v.channel?.id || 'unknown';
                         const cname = v.channel?.name || 'Unknown';
-                        const isMember = v.channel?.org === 'Hololive';
                         const checked = checkedVideos.has(v.id) ? 'checked' : '';
                         const fav = favoriteChannels.has(cid) ? 'favorited' : '';
                         const startMs = new Date(v.available_at).getTime();
                         const thumb = `https://img.youtube.com/vi/${v.id}/hqdefault.jpg`;
                         const timeStr = new Date(v.available_at).toLocaleString('ja-JP', {hour:'2-digit', minute:'2-digit'});
+                        const status = v.status === 'live' ? 'LIVE' : timeStr;
                         const isAnn = ANNOUNCE_KEYWORDS.some(kw => v.title.includes(kw));
                         const isMem = MEMORIAL_KEYWORDS.some(kw => v.title.includes(kw));
                         const stClass = isMem ? 'memorial' : (isAnn ? 'announce' : (v.status === 'live' ? 'live' : 'upcoming'));
-                        const stText = isMem ? '記念' : (isAnn ? '告知' : (v.status === 'live' ? 'LIVE' : timeStr));
+                        const stText = isMem ? '記念' : (isAnn ? '告知' : status);
                         html += `
                         <div class="stream-card ${fav?'favorite':''}" data-video-id="${v.id}" data-channel-id="${cid}" data-start-time="${startMs}">
-                            <div class="thumbnail-wrapper">
+                            <div style="position:relative;">
                                 <a href="https://youtu.be/${v.id}" target="_blank">
                                     <img src="${thumb}" class="thumbnail" onerror="this.src='https://via.placeholder.com/280x158/333/FFF?text=No+Image'">
                                 </a>
-                                <div class="checkbox-overlay ${checked}" onclick="event.stopPropagation(); toggleCheck('${v.id}', this)"></div>
-                                ${isMember ? `<div class="favorite-overlay ${fav}" onclick="event.stopPropagation(); toggleFavorite('${cid}', this)"></div>` : ''}
+                                <div class="checkbox-overlay ${checked}" onclick="event.stopPropagation();toggleCheck('${v.id}', this)"></div>
+                                ${v.channel?.org === 'Hololive' ? `<div class="favorite-overlay ${fav}" onclick="event.stopPropagation();toggleFavorite('${cid}', this)"></div>` : ''}
                             </div>
                             <div class="stream-info">
                                 <div class="member-name">${cname}</div>
@@ -588,38 +492,43 @@
                     });
                     html += `</div></div>`;
                 });
-                content.innerHTML = html || '<p class="no-streams">配信予定なし</p>';
-                updateCheckedPanel();
+                content.innerHTML = html || '<p style="text-align:center;color:#666;">今日の配信予定はありません</p>';
+                applyFilter();
+                updateSummary();
                 updateHeaderCheckboxes();
-                applyFilter(currentMode);
                 startAutoRefresh();
             } catch (e) {
-                content.innerHTML = `<p class="error">読み込み失敗: ${e.message}</p>`;
+                content.innerHTML = `<div class="error-message"><strong>読み込み失敗</strong><p>${e.message}</p><small>【更新】ボタンで再試行</small></div>`;
             }
+        }
+        function updateSummary() {
+            const live = document.querySelectorAll('.status-indicator.live').length;
+            const upcoming = document.querySelectorAll('.status-indicator.upcoming').length;
+            document.getElementById('todayCount').textContent = live + upcoming;
+            document.getElementById('liveCount').textContent = live;
+            document.getElementById('upcomingCount').textContent = upcoming;
         }
         function toggleFavorite(id, el) {
             event.stopPropagation();
-            const has = favoriteChannels.has(id);
-            if (has) favoriteChannels.delete(id);
-            else favoriteChannels.add(id);
-            el.classList.toggle('favorited', !has);
+            if (favoriteChannels.has(id)) {
+                favoriteChannels.delete(id);
+                el.classList.remove('favorited');
+            } else {
+                favoriteChannels.add(id);
+                el.classList.add('favorited');
+            }
             localStorage.setItem(FAVORITE_CHANNELS_STORAGE, JSON.stringify([...favoriteChannels]));
-            document.querySelectorAll(`.stream-card[data-channel-id="${id}"]`).forEach(c => {
-                c.classList.toggle('favorite', !has);
-            });
-            applyFilter(currentMode);
+            document.querySelectorAll(`.stream-card[data-channel-id="${id}"]`).forEach(c => c.classList.toggle('favorite', favoriteChannels.has(id)));
+            applyFilter();
         }
         function showToast(message, isLive = false) {
             if ([...toastContainer.children].some(t => t.querySelector('.body')?.textContent === message)) return;
             const toast = document.createElement('div');
             toast.className = `notification-toast ${isLive ? 'live' : ''}`;
-            toast.innerHTML = `
-                <button class="close-btn" onclick="closeToast(this)">x</button>
-                <div class="title">${isLive ? '配信開始！' : 'あと5分'}</div>
-                <div class="body">${message}</div>
-            `;
+            toast.innerHTML = `<button class="close-btn" onclick="closeToast(this)">x</button><div class="title">${isLive?'配信開始！':'あと5分'}</div><div class="body">${message}</div>`;
             toastContainer.appendChild(toast);
             requestAnimationFrame(() => toast.classList.add('show'));
+            // 音は鳴らさない（削除済み）
             const timer = setTimeout(() => closeToast(toast.querySelector('.close-btn')), 600000);
             toast.dataset.timer = timer;
         }
@@ -651,23 +560,23 @@
                 }
             });
         }
-        const notifyBtn = document.createElement('button');
-        notifyBtn.textContent = `通知: ${notifyEnabled?'ON':'OFF'}`;
-        notifyBtn.style.background = notifyEnabled ? '#FF9800' : '#666';
-        notifyBtn.style.fontSize = '0.9rem';
-        notifyBtn.onclick = () => {
+        const notifyBtn20 = document.createElement('button');
+        notifyBtn20.id = 'notifyBtn';
+        notifyBtn20.textContent = `通知: ${notifyEnabled?'ON':'OFF'}`;
+        notifyBtn20.style.background = notifyEnabled ? '#FF9800' : '#666';
+        notifyBtn20.style.marginLeft = '10px';
+        notifyBtn20.onclick = () => {
             notifyEnabled = !notifyEnabled;
-            notifyBtn.textContent = `通知: ${notifyEnabled?'ON':'OFF'}`;
-            notifyBtn.style.background = notifyEnabled ? '#FF9800' : '#666';
+            notifyBtn20.textContent = `通知: ${notifyEnabled?'ON':'OFF'}`;
+            notifyBtn20.style.background = notifyEnabled ? '#FF9800' : '#666';
             localStorage.setItem('notifyEnabled', notifyEnabled);
         };
-        document.querySelectorAll('.controls')[0].appendChild(notifyBtn);
+        document.querySelector('.controls').appendChild(notifyBtn20);
         setInterval(checkNotifications, 10000);
         window.onload = () => {
             loadSchedule();
-            startAutoRefresh();
-            checkNotifications();
             updateCheckedPanel();
+            checkNotifications();
         };
     </script>
 </body>
