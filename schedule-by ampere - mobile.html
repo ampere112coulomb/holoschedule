@@ -215,7 +215,7 @@
         }
         #linkOutput {
             background: #f8f9fa; color: #000; padding: 12px; border-radius: 6px;
-            font-family: |monospace; white-space: pre-wrap; font-size: 0.85rem;
+            font-family: monospace; white-space: pre-wrap; font-size: 0.85rem;
             border: 1px solid #ddd; max-height: 300px; overflow-y: auto;
         }
         [data-theme="dark"] #linkOutput { background: #333; color: #EEE; border-color: #555; }
@@ -314,7 +314,6 @@
         const MEMORIAL_KEYWORDS = ['周年', '生誕', '爆誕'];
         let notifyEnabled = localStorage.getItem('notifyEnabled') !== 'false';
         const toastContainer = document.getElementById('toast-container');
-
         function updateJSTClock() {
             const now = new Date();
             const jst = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Tokyo"}));
@@ -325,7 +324,6 @@
         }
         updateJSTClock();
         setInterval(updateJSTClock, 1000);
-
         function toggleTheme() {
             const isDark = document.body.getAttribute('data-theme') === 'dark';
             document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
@@ -336,7 +334,6 @@
             document.body.setAttribute('data-theme', 'dark');
             document.getElementById('themeBtn').textContent = 'ライトモード';
         }
-
         function startAutoRefresh() {
             clearInterval(autoRefreshTimer);
             countdown = 300;
@@ -348,7 +345,6 @@
                 if (countdown <= 0) loadSchedule();
             }, 1000);
         }
-
         function updateCheckedPanel() {
             const list = document.getElementById('checkedList');
             const countEl = document.getElementById('checkedCount');
@@ -370,7 +366,6 @@
             });
             list.innerHTML = html;
         }
-
         function toggleCheckedPanel() {
             const panel = document.getElementById('checkedPanel');
             const isShown = panel.classList.contains('show');
@@ -383,7 +378,6 @@
                 setTimeout(() => panel.classList.add('show'), 10);
             }
         }
-
         function updateHeaderCheckboxes() {
             document.querySelectorAll('.time-group').forEach(group => {
                 const cards = group.querySelectorAll('.stream-card');
@@ -400,11 +394,11 @@
                 }
             });
         }
-
         function toggleTimeGroupCheck(timeKey, el) {
             event.stopPropagation();
             const group = el.closest('.time-group');
-            const cards = group.querySelectorAll('.stream-card');
+            const cards = group.querySelectorAll('.stream-card:not([style*="display: none"])');
+            if (cards.length === 0) return;
             const videoIds = Array.from(cards).map(c => c.dataset.videoId);
             const allChecked = videoIds.every(id => checkedVideos.has(id));
             const newState = !allChecked;
@@ -421,7 +415,6 @@
             updateHeaderCheckboxes();
             applyFilter(currentMode);
         }
-
         function openLinkModal() {
             const checked = document.querySelectorAll('.checkbox-overlay.checked');
             if (checked.length === 0) return alert('チェックがありません！');
@@ -453,11 +446,9 @@
             document.getElementById('linkOutput').textContent = output.trim();
             document.getElementById('linkModal').classList.add('show');
         }
-
         function closeLinkModal() {
             document.getElementById('linkModal').classList.remove('show');
         }
-
         function copyToClipboard() {
             const text = document.getElementById('linkOutput').textContent;
             navigator.clipboard.writeText(text).then(() => {
@@ -471,7 +462,6 @@
                 }, 1500);
             });
         }
-
         function toggleCheck(id, el) {
             event.stopPropagation();
             const has = checkedVideos.has(id);
@@ -483,7 +473,6 @@
             updateHeaderCheckboxes();
             applyFilter(currentMode);
         }
-
         function clearAllChecks() {
             if (!confirm('すべて解除しますか？')) return;
             checkedVideos.clear();
@@ -493,7 +482,6 @@
             updateHeaderCheckboxes();
             applyFilter(currentMode);
         }
-
         let searchTimeout;
         document.getElementById('searchInput').addEventListener('input', function() {
             clearTimeout(searchTimeout);
@@ -502,7 +490,6 @@
                 applyFilter(currentMode);
             }, 300);
         });
-
         function applyFilter(mode = 'all') {
             currentMode = mode;
             document.querySelectorAll('.time-group').forEach(group => {
@@ -529,7 +516,6 @@
                 group.style.display = visibleCount > 0 ? 'block' : 'none';
             });
         }
-
         document.querySelectorAll('.tab-button[data-mode]').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.tab-button[data-mode]').forEach(b => b.classList.remove('active'));
@@ -540,14 +526,12 @@
                 applyFilter(btn.dataset.mode);
             });
         });
-
         document.getElementById('favoriteFilterBtn').addEventListener('click', () => {
             isFavoriteFilterActive = !isFavoriteFilterActive;
             document.getElementById('favoriteFilterBtn').textContent = `推しのみ ${isFavoriteFilterActive ? 'ON' : 'OFF'}`;
             document.getElementById('favoriteFilterBtn').classList.toggle('active', isFavoriteFilterActive);
             applyFilter(currentMode);
         });
-
         async function loadSchedule() {
             const content = document.getElementById('content');
             content.innerHTML = '<p class="loading">読み込み中...</p>';
@@ -613,7 +597,6 @@
                 content.innerHTML = `<p class="error">読み込み失敗: ${e.message}</p>`;
             }
         }
-
         function toggleFavorite(id, el) {
             event.stopPropagation();
             const has = favoriteChannels.has(id);
@@ -626,7 +609,6 @@
             });
             applyFilter(currentMode);
         }
-
         function showToast(message, isLive = false) {
             if ([...toastContainer.children].some(t => t.querySelector('.body')?.textContent === message)) return;
             const toast = document.createElement('div');
@@ -641,14 +623,12 @@
             const timer = setTimeout(() => closeToast(toast.querySelector('.close-btn')), 600000);
             toast.dataset.timer = timer;
         }
-
         function closeToast(btn) {
             const toast = btn.parentElement;
             clearTimeout(toast.dataset.timer);
             toast.classList.remove('show');
             setTimeout(() => toast.remove(), 400);
         }
-
         function checkNotifications() {
             if (!notifyEnabled) return;
             const now = Date.now();
@@ -671,7 +651,6 @@
                 }
             });
         }
-
         const notifyBtn = document.createElement('button');
         notifyBtn.textContent = `通知: ${notifyEnabled?'ON':'OFF'}`;
         notifyBtn.style.background = notifyEnabled ? '#FF9800' : '#666';
@@ -684,7 +663,6 @@
         };
         document.querySelectorAll('.controls')[0].appendChild(notifyBtn);
         setInterval(checkNotifications, 10000);
-
         window.onload = () => {
             loadSchedule();
             startAutoRefresh();
