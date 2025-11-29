@@ -140,7 +140,6 @@
         }
         .error-message {text-align:center;color:var(--error);padding:20px;background:rgba(255,0,0,0.1);border-radius:10px;margin:20px 0;}
 
-        /* 右下 四角いチェック済みボタン */
         #checkedBottomBar {
             position: fixed;
             bottom: 20px;
@@ -168,7 +167,6 @@
             font-size: 19px;
         }
 
-        /* 下から出てくるパネル */
         #checkedPanelNew {
             position: fixed;
             bottom: 0;
@@ -203,12 +201,10 @@
 <body>
     <div class="clock" id="jstClock">JST: 00:00:00</div>
 
-    <!-- 右下に表示される四角いボタン -->
     <div id="checkedBottomBar" onclick="toggleCheckedPanel()" style="display:none;">
         チェック済みの配信 [<span id="checkedCountBtn">0</span>]
     </div>
 
-    <!-- 下からスライドアップするパネル -->
     <div id="checkedPanelNew">
         <div class="panel-header">
             <span>チェック済み配信 (<span id="checkedCount">0</span>件)</span>
@@ -229,8 +225,11 @@
         <div class="controls">
             <button onclick="loadSchedule()">更新</button>
             <button onclick="toggleTheme()" id="themeBtn">ダークモード</button>
-            <button onclick="window.open('https://ampere112coulomb.github.io/holoschedule/schedule-by%20ampere.html','_blank')"
-                    style="background:#0288d1;color:white;">PC版</button>
+            <!-- ここが変更点：新しいタブで開かず、同じタブで遷移 -->
+            <a href="https://ampere112coulomb.github.io/holoschedule/schedule-by%20ampere.html" 
+               style="background:#0288d1;color:white;padding:8px 14px;border-radius:6px;text-decoration:none;font-size:14px;display:inline-block;">
+               PC版
+            </a>
             <input type="text" id="searchInput" class="search-bar" placeholder="タイトル・メンバー名で検索...">
             <span style="margin-left:10px;">自動更新: <span id="timer">5:00</span></span>
         </div>
