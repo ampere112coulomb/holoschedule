@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>hololist</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
-    <!-- PWA用（manifest.jsonを同じフォルダに置けば有効） -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0288D1">
     <style>
         :root {
             --bg-gradient: linear-gradient(135deg, #00B7EB, #FFFFFF);
@@ -30,9 +27,7 @@
             --favorite-card-border: #FFC107;
             --error: #E53935;
         }
-        [data
-
-=data-theme="dark"] {
+        [data-theme="dark"] {
             --bg-gradient: linear-gradient(135deg, #0D47A1, #1A1A1A);
             --card-bg: #1E1E1E;
             --text: #EEE;
@@ -53,181 +48,111 @@
             --favorite-card-border: #FFB300;
             --error: #EF5350;
         }
-        body {font-family:'Noto Sans JP',sans-serif;background:var(--bg-gradient);margin:0;padding:15px 8px;color:var(--text);min-height:100vh;box-sizing:border-box;}
-        .clock {position:fixed;top:10px;right:10px;background:var(--clock-bg);padding:8px 12px;border-radius:8px;box-shadow:0 2px 10px var(--shadow);font-weight:bold;color:var(--clock-text);z-index:1000;font-size:14px;border:1px solid var(--border);}
-        .container {max-width:1200px;margin:0 auto;background:rgba(255,255,255,0.98);border-radius:12px;box-shadow:0 4px 20px var(--shadow);padding:15px;}
+        body {font-family:'Noto Sans JP',sans-serif;background:var(--bg-gradient);margin:0;padding:20px;color:var(--text);position:relative;}
+        .clock {position:fixed;top:20px;right:20px;background:var(--clock-bg);padding:10px 15px;border-radius:8px;box-shadow:0 2px 10px var(--shadow);font-weight:bold;color:var(--clock-text);z-index:1000;border:1px solid var(--border);}
+        .container {max-width:1200px;margin:0 auto;background:rgba(255,255,255,0.98);border-radius:12px;box-shadow:0 4px 20px var(--shadow);padding:20px;}
         [data-theme="dark"] .container {background:rgba(30,30,30,0.98);}
-        .logo-img {width:100%;max-width:600px;height:auto;display:block;margin:0 auto 15px;border-radius:8px;box-shadow:0 2px 8px var(--shadow);}
-        .controls {display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:15px;align-items:center;}
-        button {padding:8px 14px;background:var(--header-bg);color:white;border:none;border-radius:6px;cursor:pointer;font-size:14px;}
-        button:hover {opacity:0.9;}
-        .search-bar {padding:10px 12px;border:1px solid #ccc;border-radius:6px;width:100%;max-width:300px;font-size:15px;box-sizing:border-box;}
+        .logo-img {width:600px;max-width:100%;height:auto;display:block;margin:0 auto 20px;border-radius:8px;box-shadow:0 2px 8px var(--shadow);}
+        .controls {display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:20px;align-items:center;}
+        button {padding:8px 16px;background:var(--header-bg);color:white;border:none;border-radius:4px;cursor:pointer;}
+        button:hover {background:#0277BD;}
+        .search-bar {padding:8px 12px;border:1px solid #ccc;border-radius:4px;width:250px;font-size:1em;}
         [data-theme="dark"] .search-bar {background:#333;color:#EEE;border-color:#555;}
-        .summary {text-align:center;font-size:1.15em;margin:15px 0;color:var(--header-bg);font-weight:bold;}
-        .filter-controls {display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px;}
-        .filter-checkbox {display:flex;align-items:center;padding:8px 14px;background:#f0f0f0;color:#333;border-radius:30px;cursor:pointer;user-select:none;font-weight:bold;font-size:14px;transition:all .2s;}
+        .summary {text-align:center;font-size:1.1em;margin:10px 0;color:var(--header-bg);}
+        .filter-controls {display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:20px;}
+        .filter-checkbox {display:flex;align-items:center;padding:8px 16px;background:#E0E0E0;color:#333;border-radius:4px;cursor:pointer;user-select:none;font-weight:bold;position:relative;transition:background .2s;}
         [data-theme="dark"] .filter-checkbox {background:#333;color:#EEE;}
-        .filter-checkbox input {position:absolute;opacity:0;}
-        .filter-checkbox .checkmark {
-            width:22px;height:22px;
-            background:rgba(255,255,255,0.3);border:2px solid rgba(255,255,255,0.6);
-            border-radius:50%;margin-right:8px;transition:all .2s;
-        }
-        .filter-checkbox input:checked ~ .checkmark {
-            background:var(--check-bg);border-color:var(--check-bg);
-        }
+        .filter-checkbox:hover {background:#D0D0D0;}
+        [data-theme="dark"] .filter-checkbox:hover {background:#444;}
+        .filter-checkbox input {position:absolute;opacity:0;cursor:pointer;height:0;width:0;}
+        .filter-checkbox .checkmark {width:24px;height:24px;background:rgba(255,255,255,0.3);border:2px solid rgba(255,255,255,0.6);border-radius:50%;margin-right:8px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,0.3);transition:all .2s;font-size:14px;color:transparent;}
+        .filter-checkbox input:checked ~ .checkmark {background:var(--check-bg);border-color:var(--check-bg);color:white;}
+        .filter-checkbox input:checked ~ .checkmark::after {content:'✓';font-weight:bold;}
         .filter-checkbox[data-mode="all"] input:checked ~ .checkmark {background:var(--all-check-bg);border-color:var(--all-check-bg);}
+        .filter-checkbox[data-mode="announce"] .checkmark {border-color:var(--announce);}
         .filter-checkbox[data-mode="announce"] input:checked ~ .checkmark {background:var(--announce);border-color:var(--announce);}
-        .filter-checkbox[data-mode="memorial"] input:checked ~ .checkmark {background:var(--memorial);border-color:var(--memorial);}
-        #favoriteFilterBtn input:checked ~ .checkmark {background:var(--favorite-bg);border-color:var(--favorite-bg);}
+        .filter-checkbox[data-mode="memorial"] .checkmark {border-color:var(--memorial);}
+        .filter-checkbox[data-mode="memorial"] input:checked ~ .checkmark {background:var(--memorial);border-color:var(--memorial);color:white;}
+        .filter-checkbox[data-mode="checked"] .checkmark {border-color:var(--check-border);}
+        .filter-checkbox[data-mode="checked"] input:checked ~ .checkmark {background:var(--check-bg);border-color:var(--check-border);color:white;}
+        #favoriteFilterBtn .checkmark {border-color:var(--favorite-border);}
+        #favoriteFilterBtn input:checked ~ .checkmark {background:var(--favorite-bg);border-color:var(--favorite-bg);color:white;}
+        #favoriteFilterBtn input:checked ~ .checkmark::after {content:'★';font-weight:bold;}
         .filter-checkbox.active {background:var(--header-bg);color:white;}
-        .clear-all-btn {background:#ddd;color:#333;padding:8px 16px;border-radius:30px;font-size:14px;}
-        [data-theme="dark"] .clear-all-btn {background:#444;color:#EEE;}
-        .time-group {margin-bottom:28px;}
-        .time-header {font-size:1.2em;font-weight:bold;color:#FFF;background:var(--header-bg);padding:12px 15px;border-radius:8px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-        .header-checkbox {width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,0.3);border:2px solid rgba(255,255,255,0.6);cursor:pointer;transition:all .2s;}
+        [data-theme="dark"] .filter-checkbox.active {background:var(--header-bg);}
+        .clear-all-btn {background:#E0E0E0;color:#333;}
+        [data-theme="dark"] .clear-all-btn {background:#333;color:#EEE;}
+        .clear-all-btn:hover {background:#D0D0D0;}
+        [data-theme="dark"] .clear-all-btn:hover {background:#444;}
+        .time-group {margin-bottom:20px;position:relative;}
+        .time-header {font-size:1.2em;font-weight:bold;color:#FFF;background:var(--header-bg);padding:10px;border-radius:4px;display:flex;align-items:center;justify-content:space-between;}
+        .time-header span {flex:1;}
+        .header-checkbox {width:24px;height:24px;border-radius:50%;cursor:pointer;background:rgba(255,255,255,0.3);border:2px solid rgba(255,255,255,0.6);box-shadow:0 1px 3px rgba(0,0,0,0.3);transition:all .2s;margin-left:10px;flex-shrink:0;}
         .header-checkbox.checked {background:var(--check-bg);border-color:var(--check-bg);}
-        .schedule-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-            gap: 16px;
-            justify-items: stretch;
-            padding: 0 8px;
-        }
-        @media (max-width: 560px) {
-            .schedule-container { grid-template-columns: 1fr; }
-        }
-        .stream-card {
-            width: 100%;
-            background:var(--card-bg);
-            border-radius:12px;
-            overflow:hidden;
-            box-shadow:0 4px 12px var(--shadow);
-            position:relative;
-            border:3px solid transparent;
-            transition:transform .2s,box-shadow .2s;
-        }
+        .schedule-container {overflow-x:auto;white-space:nowrap;padding-bottom:10px;}
+        .stream-card {display:inline-block;width:280px;margin-right:15px;background:var(--card-bg);border-radius:8px;overflow:hidden;box-shadow:0 2px 5px var(--shadow);position:relative;border:2px solid transparent;transition:transform .2s;}
         .stream-card.favorite {border-color:var(--favorite-card-border)!important;}
-        .stream-card:hover {transform:translateY(-4px);box-shadow:0 8px 20px var(--shadow);}
+        .stream-card:hover {transform:translateY(-3px);}
         .thumbnail {width:100%;aspect-ratio:16/9;object-fit:cover;}
-        .stream-info {padding:12px;}
-        .member-name {font-size:1.18em;font-weight:bold;color:var(--header-bg);margin-bottom:4px;}
-        .stream-title {font-size:0.95em;color:#555;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-        [data-theme="dark"] .stream-title {color:#DDD;}
+        .stream-info {padding:10px;position:relative;}
+        .member-name {font-size:1.1em;font-weight:bold;color:var(--header-bg);}
+        .stream-title {font-size:0.9em;color:#555;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+        [data-theme="dark"] .stream-title {color:#CCC;}
         .status-indicator {
-            position:absolute;bottom:12px;right:12px;padding:6px 12px;border-radius:6px;color:white;
+            position:absolute;bottom:10px;right:10px;padding:6px 12px;border-radius:6px;color:white;
             font-size:0.85em;font-weight:bold;
         }
         .live {background:var(--live);}
         .upcoming {background:var(--upcoming);}
         .announce {background:var(--announce);}
         .memorial {background:var(--memorial);}
-        /* 告知＋記念の半分割れ */
         .announce-memorial {
             background: linear-gradient(to right, var(--announce) 50%, var(--memorial) 50%);
-            font-size:0.75em !important;
-            padding:6px 8px;
         }
-        .checkbox-overlay {
-            position:absolute;top:10px;right:10px;
-            width:36px;height:36px;border-radius:50%;
-            background:rgba(255,255,255,0.4);border:2px solid rgba(255,255,255,0.6);
-            cursor:pointer;z-index:10;
-            box-shadow:0 2px 6px rgba(0,0,0,0.3);
-            transition:all .2s;
-        }
-        .checkbox-overlay.checked {
-            background:var(--check-bg);
-            border-color:var(--check-border);
-        }
-        .favorite-overlay {
-            position:absolute;top:10px;left:10px;
-            width:36px;height:36px;border-radius:50%;
-            background:rgba(255,255,255,0.5);border:2px solid var(--favorite-border);
-            cursor:pointer;z-index:10;
-            box-shadow:0 2px 6px rgba(0,0,0,0.3);
-            transition:all .2s;
-        }
-        .favorite-overlay.favorited {
-            background:var(--favorite-bg);
-            border-color:var(--favorite-bg);
-        }
-        .error-message {text-align:center;color:var(--error);padding:20px;background:rgba(255,0,0,0.1);border-radius:10px;margin:20px 0;}
-
-        #checkedBottomBar {
-            position: fixed;
-            bottom: 20px;
-            right: 16px;
-            background: var(--check-bg);
-            color: white;
-            padding: 14px 20px;
-            border-radius: 14px;
-            font-weight: bold;
-            font-size: 15px;
-            box-shadow: 0 4px 18px rgba(0,0,0,0.35);
-            z-index: 998;
-            cursor: pointer;
-            user-select: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s ease;
-            min-width: 200px;
-            justify-content: center;
-        }
-        #checkedBottomBar:active { transform: scale(0.95); }
-
-        #checkedPanelNew {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--clock-bg);
-            border-top: 4px solid var(--check-bg);
-            border-radius: 16px 16px 0 0;
-            max-height: 85vh;
-            overflow-y: auto;
-            padding: 18px;
-            z-index: 999;
-            box-shadow: 0 -8px 30px rgba(0,0,0,0.4);
-            transform: translateY(100%);
-            transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
-        }
-        #checkedPanelNew.open {
-            transform: translateY(0);
-        }
-        #checkedPanelNew .panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 14px;
-            font-weight: bold;
-            font-size: 1.2em;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255,255,255,0.2);
-        }
+        .checkbox-overlay,.favorite-overlay {position:absolute;width:32px;height:32px;border-radius:50%;cursor:pointer;z-index:10;box-shadow:0 1px 3px rgba(0,0,0,0.3);transition:all .2s;display:flex;align-items:center;justify-content:center;font-size:18px;}
+        .checkbox-overlay {top:8px;right:8px;background:rgba(255,255,255,0.3);border:2px solid rgba(255,255,255,0.6);}
+        .checkbox-overlay.checked {background:var(--check-bg);border-color:var(--check-border);}
+        .favorite-overlay {top:8px;left:8px;background:rgba(255,255,255,0.4);border:2px solid var(--favorite-border);}
+        .favorite-overlay::before {content:'★';color:transparent;}
+        .favorite-overlay.favorited {background:var(--favorite-bg);border-color:var(--favorite-bg);}
+        .favorite-overlay.favorited::before {color:white;}
+        .stream-card[style*="display: none"] .checkbox-overlay,
+        .stream-card.force-hidden-check .checkbox-overlay {display:none!important;}
+        #checkedPanel {position:fixed;top:70px;right:20px;width:340px;background:var(--clock-bg);border:2px solid var(--check-bg);border-radius:10px;padding:15px;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,0.2);font-size:0.9em;display:none;}
+        #checkedPanel .header {display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-weight:bold;color:var(--check-bg);}
+        #checkedList {max-height:220px;overflow-y:auto;margin-bottom:10px;}
+        #checkedList > div {margin:6px 0;padding:8px;background:rgba(76,175,80,0.1);border-radius:6px;cursor:pointer;}
+        #linkOutput {background:#f8f9fa;color:#000;padding:12px;border-radius:6px;font-family:monospace;white-space:pre-wrap;max-height:200px;overflow-y:auto;margin-top:10px;display:none;border:1px solid #ddd;}
+        [data-theme="dark"] #linkOutput {background:#333;color:#EEE;border-color:#555;}
+        #toast-container {position:fixed;right:20px;bottom:20px;z-index:9999;display:flex;flex-direction:column;gap:12px;align-items:flex-end;}
+        .notification-toast {min-width:320px;max-width:400px;background:#1E1E1E;color:#FFF;border-radius:8px;box-shadow:0 8px 25px rgba(0,0,0,0.4);padding:16px;font-family:'Segoe UI','Noto Sans JP',sans-serif;border-left:4px solid #00B7EB;opacity:0;transform:translateY(20px);transition:all .4s cubic-bezier(0.25,0.8,0.25,1);}
+        .notification-toast.show {opacity:1;transform:translateY(0);}
+        .notification-toast.live {border-left-color:#E53935;}
+        .notification-toast .close-btn {position:absolute;top:8px;right:12px;background:none;border:none;color:#AAA;font-size:20px;cursor:pointer;padding:0;width:24px;height:24px;line-height:24px;}
+        .notification-toast .close-btn:hover {color:#FFF;}
+        .notification-toast .title {font-weight:600;font-size:15px;margin-bottom:6px;}
+        .notification-toast .body {font-size:14px;line-height:1.4;color:#DDD;}
+        .error-message {text-align:center;color:var(--error);font-weight:bold;padding:20px;background:rgba(255,0,0,0.05);border-radius:8px;margin:20px 0;}
+        [data-theme="dark"] .error-message {background:rgba(255,0,0,0.15);}
     </style>
 </head>
 <body>
     <div class="clock" id="jstClock">JST: 00:00:00</div>
-
-    <div id="checkedBottomBar" onclick="toggleCheckedPanel()" style="display:none;">
-        チェック済みの配信 [<span id="checkedCountBtn">0</span>]
-    </div>
-
-    <div id="checkedPanelNew">
-        <div class="panel-header">
-            <span>チェック済み配信 (<span id="checkedCount">0</span>件)</span>
-            <button onclick="document.getElementById('checkedPanelNew').classList.remove('open')" style="background:none;border:none;font-size:28px;cursor:pointer;color:#AAA;">×</button>
+    <div id="checkedPanel">
+        <div class="header">
+            <span>チェック済み配信 (<span id="checkedCount">0</span>)</span>
+            <button onclick="document.getElementById('checkedPanel').style.display='none'" style="background:none;border:none;font-size:20px;cursor:pointer;color:#AAA;">x</button>
         </div>
         <div id="checkedList"></div>
-        <button onclick="generateLinkSummary()" style="width:100%;padding:12px;background:#4CAF50;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;margin-top:14px;font-size:15px;">配信リンクまとめを作成</button>
-        <div id="linkOutput" style="white-space:pre-wrap;margin-top:12px;padding:12px;background:#333;color:#0f0;border-radius:8px;display:none;font-size:14px;"></div>
-        <button onclick="copyToClipboard()" id="copyBtn" style="width:100%;margin-top:10px;padding:12px;background:#2196F3;color:white;border:none;border-radius:8px;cursor:pointer;display:none;">コピーする</button>
+        <button onclick="generateLinkSummary()" style="width:100%;padding:10px;background:#4CAF50;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:bold;">
+            配信リンクまとめを作成
+        </button>
+        <div id="linkOutput"></div>
+        <button onclick="copyToClipboard()" id="copyBtn" style="width:100%;margin-top:8px;padding:10px;background:#2196F3;color:white;border:none;border-radius:6px;cursor:pointer;display:none;">
+            コピーする
+        </button>
     </div>
-
     <div id="toast-container"></div>
-
     <div class="container">
         <h1 style="margin:0;padding:0;text-align:center;">
             <img src="https://drive.google.com/thumbnail?id=1L0g9BOCy2OkCuPPqZP1LoqeXQKP-OhRJ&sz=w1200" alt="hololist" class="logo-img">
@@ -235,29 +160,36 @@
         <div class="controls">
             <button onclick="loadSchedule()">更新</button>
             <button onclick="toggleTheme()" id="themeBtn">ダークモード</button>
-            <a href="https://ampere112coulomb.github.io/holoschedule/schedule-by%20ampere.html" 
-               style="background:#0288d1;color:white;padding:8px 14px;border-radius:6px;text-decoration:none;font-size:14px;display:inline-block;">
-               PC版
-            </a>
+            <button onclick="window.location.href='https://ampere112coulomb.github.io/holoschedule/schedule-by%20ampere%20-%20mobile.html'">モバイル版</button>
             <input type="text" id="searchInput" class="search-bar" placeholder="タイトル・メンバー名で検索...">
-            <span style="margin-left:10px;">自動更新: <span id="timer">5:00</span></span>
+            <span class="auto-refresh">自動更新: <span id="timer">5:00</span></span>
         </div>
         <div class="summary" id="summary">今日の配信: <strong id="todayCount">0</strong>本（LIVE: <span id="liveCount">0</span> | 予定: <span id="upcomingCount">0</span>）</div>
         <div class="filter-controls">
             <label class="filter-checkbox active" data-mode="all">
-                <input type="checkbox" checked><span class="checkmark"></span><span>すべて</span>
+                <input type="checkbox" checked>
+                <span class="checkmark"></span>
+                <span>すべて</span>
             </label>
             <label class="filter-checkbox" data-mode="announce">
-                <input type="checkbox"><span class="checkmark"></span><span>告知枠</span>
+                <input type="checkbox">
+                <span class="checkmark"></span>
+                <span>告知枠</span>
             </label>
             <label class="filter-checkbox" data-mode="memorial">
-                <input type="checkbox"><span class="checkmark"></span><span>記念枠</span>
+                <input type="checkbox">
+                <span class="checkmark"></span>
+                <span>記念枠</span>
             </label>
             <label class="filter-checkbox" data-mode="checked">
-                <input type="checkbox"><span class="checkmark"></span><span>チェック済み</span>
+                <input type="checkbox">
+                <span class="checkmark"></span>
+                <span>チェック済み</span>
             </label>
             <label class="filter-checkbox" id="favoriteFilterBtn">
-                <input type="checkbox"><span class="checkmark"></span><span>推しのみ OFF</span>
+                <input type="checkbox">
+                <span class="checkmark"></span>
+                <span>推しのみ OFF</span>
             </label>
             <button class="clear-all-btn" onclick="clearAllChecks()">全チェック解除</button>
         </div>
@@ -272,8 +204,8 @@
         let favoriteChannels = new Set(JSON.parse(localStorage.getItem(FAVORITE_CHANNELS_STORAGE) || '[]'));
         let countdown = 300;
         let autoRefreshTimer;
-        const ANNOUNCE_KEYWORDS = ['告知','お披露目','発表','新衣装','重大','おひろめ'];
-        const MEMORIAL_KEYWORDS = ['周年','生誕','爆誕'];
+        const ANNOUNCE_KEYWORDS = ['告知', 'お披露目', '発表', '新衣装', '重大', 'おひろめ'];
+        const MEMORIAL_KEYWORDS = ['周年', '生誕', '爆誕'];
         let notifyEnabled = localStorage.getItem('notifyEnabled') !== 'false';
         const toastContainer = document.getElementById('toast-container');
 
@@ -310,40 +242,31 @@
             }, 1000);
         }
 
-        function toggleCheckedPanel() {
-            document.getElementById('checkedPanelNew').classList.toggle('open');
-        }
-
         function updateCheckedPanel() {
+            const list = document.getElementById('checkedList');
+            const panel = document.getElementById('checkedPanel');
+            const countEl = document.getElementById('checkedCount');
             const checked = document.querySelectorAll('.checkbox-overlay.checked');
-            const count = checked.length;
-            document.getElementById('checkedCount').textContent = count;
-            document.getElementById('checkedCountBtn').textContent = count;
-
-            const bar = document.getElementById('checkedBottomBar');
-            bar.style.display = count > 0 ? 'flex' : 'none';
-
-            if (count === 0) {
-                document.getElementById('checkedPanelNew').classList.remove('open');
+            countEl.textContent = checked.length;
+            if (checked.length === 0) {
+                panel.style.display = 'none';
                 document.getElementById('linkOutput').style.display = 'none';
                 document.getElementById('copyBtn').style.display = 'none';
-                document.getElementById('checkedList').innerHTML = '';
                 return;
             }
-
             let html = '';
             checked.forEach(el => {
                 const card = el.closest('.stream-card');
                 const member = card.querySelector('.member-name').textContent;
                 const title = card.querySelector('.stream-title').textContent;
                 const time = new Date(parseInt(card.dataset.startTime)).toLocaleString('ja-JP', {hour:'2-digit', minute:'2-digit'});
-                html += `<div style="padding:12px 0;border-bottom:1px solid #555;cursor:pointer;" 
-                         onclick="document.querySelector('.stream-card[data-video-id=\\'${card.dataset.videoId}\\']').scrollIntoView({behavior:'smooth',block:'center'}); toggleCheckedPanel();">
+                html += `<div onclick="document.querySelector('.stream-card[data-video-id=\\'${card.dataset.videoId}\\']').scrollIntoView({behavior:'smooth',block:'center'})">
                     <strong>${member}</strong><br>
-                    <small>${time} ~ ${title.slice(0,38)}${title.length>38?'...':''}</small>
+                    <small>${time} ~ ${title.slice(0,25)}${title.length>25?'...':''}</small>
                 </div>`;
             });
-            document.getElementById('checkedList').innerHTML = html;
+            list.innerHTML = html;
+            panel.style.display = 'block';
         }
 
         function updateHeaderCheckboxes() {
@@ -359,7 +282,7 @@
                 const someChecked = checkedCount > 0 && !allChecked;
                 headerCheck.classList.toggle('checked', allChecked || someChecked);
                 if (someChecked) {
-                    headerCheck.style.background = 'linear-gradient(to right, var(--check-bg) 50%, rgba(255,255,255,0.3) 50%)';
+                    headerCheck.style.background = 'linear-gradient(to right, var(--check-bg) 50%, rgba(255,255,255,0.3)  50%)';
                 } else {
                     headerCheck.style.background = allChecked ? 'var(--check-bg)' : 'rgba(255,255,255,0.3)';
                 }
@@ -398,6 +321,7 @@
             const groups = {};
             checked.forEach(el => {
                 const card = el.closest('.stream-card');
+                if (!card) return;
                 const videoId = card.dataset.videoId;
                 const url = `https://youtu.be/${videoId}`;
                 const member = card.querySelector('.member-name').textContent;
@@ -497,12 +421,13 @@
                     const matchesSearch = !searchText || title.includes(searchText) || member.includes(searchText);
                     let show = matchesSearch;
                     if (!filterAll) {
+                        show = matchesSearch;
                         if (filterAnnounce && !isAnnounce) show = false;
                         if (filterMemorial && !isMemorial) show = false;
                         if (filterChecked && !isChecked) show = false;
                     }
                     if (filterFavorite && !isFavorite) show = false;
-                    card.style.display = show ? 'block' : 'none';
+                    card.style.display = show ? 'inline-block' : 'none';
                     if (show) {
                         card.classList.remove('force-hidden-check');
                         visibleCount++;
@@ -574,10 +499,13 @@
                             stText = 'LIVE';
                         } else if (isAnn && isMem) {
                             stClass = 'announce-memorial';
+                            stText = timeStr;  // ← 時間表示
                         } else if (isAnn) {
                             stClass = 'announce';
+                            stText = '告知';
                         } else if (isMem) {
                             stClass = 'memorial';
+                            stText = '記念';
                         }
 
                         html += `
@@ -602,7 +530,6 @@
                 applyFilter();
                 updateSummary();
                 updateHeaderCheckboxes();
-                updateCheckedPanel();
                 startAutoRefresh();
             } catch (e) {
                 content.innerHTML = `<div class="error-message"><strong>読み込み失敗</strong><p>${e.message}</p><small>【更新】ボタンで再試行</small></div>`;
@@ -632,12 +559,21 @@
         }
 
         function showToast(message, isLive = false) {
-            if ([...toastContainer.children].some(t => t.textContent.includes(message))) return;
+            if ([...toastContainer.children].some(t => t.querySelector('.body')?.textContent === message)) return;
             const toast = document.createElement('div');
-            toast.style.cssText = 'position:fixed;bottom:80px;right:16px;background:#1E1E1E;color:#FFF;padding:16px 20px;border-radius:12px;box-shadow:0 8px 25px rgba(0,0,0,0.4);z-index:9999;max-width:90vw;border-left:5px solid ' + (isLive?'#E53935':'#00B7EB');
-            toast.innerHTML = `<button style="position:absolute;top:6px;right:10px;background:none;border:none;color:#AAA;font-size:20px;cursor:pointer;" onclick="this.parentElement.remove()">×</button><div style="font-weight:bold;">${isLive?'配信開始！':'あと5分'}</div><div>${message}</div>`;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 8000);
+            toast.className = `notification-toast ${isLive ? 'live' : ''}`;
+            toast.innerHTML = `<button class="close-btn" onclick="closeToast(this)">x</button><div class="title">${isLive?'配信開始！':'あと5分'}</div><div class="body">${message}</div>`;
+            toastContainer.appendChild(toast);
+            requestAnimationFrame(() => toast.classList.add('show'));
+            const timer = setTimeout(() => closeToast(toast.querySelector('.close-btn')), 600000);
+            toast.dataset.timer = timer;
+        }
+
+        function closeToast(btn) {
+            const toast = btn.parentElement;
+            clearTimeout(toast.dataset.timer);
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 400);
         }
 
         function checkNotifications() {
@@ -663,24 +599,19 @@
             });
         }
 
-        const notifyBtn = document.createElement('button');
-        notifyBtn.id = 'notifyBtn';
-        notifyBtn.textContent = `通知: ${notifyEnabled?'ON':'OFF'}`;
-        notifyBtn.style.cssText = 'background:'+(notifyEnabled?'#FF9800':'#666')+';margin-left:10px;padding:8px 14px;border-radius:6px;color:white;';
-        notifyBtn.onclick = () => {
+        const notifyBtn20 = document.createElement('button');
+        notifyBtn20.id = 'notifyBtn';
+        notifyBtn20.textContent = `通知: ${notifyEnabled?'ON':'OFF'}`;
+        notifyBtn20.style.cssText = 'background:'+(notifyEnabled?'#FF9800':'#666')+';margin-left:10px;padding:8px 14px;border-radius:6px;color:white;border:none;cursor:pointer;';
+        notifyBtn20.onclick = () => {
             notifyEnabled = !notifyEnabled;
-            notifyBtn.textContent = `通知: ${notifyEnabled?'ON':'OFF'}`;
-            notifyBtn.style.background = notifyEnabled ? '#FF9800' : '#666';
+            notifyBtn20.textContent = `通知: ${notifyEnabled?'ON':'OFF'}`;
+            notifyBtn20.style.background = notifyEnabled ? '#FF9800' : '#666';
             localStorage.setItem('notifyEnabled', notifyEnabled);
         };
-        document.querySelector('.controls').appendChild(notifyBtn);
+        document.querySelector('.controls').appendChild(notifyBtn20);
 
         setInterval(checkNotifications, 10000);
-
-        // PWAサービスワーカー登録（sw.jsを同じフォルダに置けば有効）
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(() => {});
-        }
 
         window.onload = () => {
             loadSchedule();
