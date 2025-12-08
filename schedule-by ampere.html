@@ -156,7 +156,6 @@
 </head>
 <body>
     <div class="clock" id="jstClock">JST: 00:00:00</div>
-
     <div id="checkedPanel">
         <div class="header">
             <span>チェック済み配信 (<span id="checkedCount">0</span>)</span>
@@ -167,10 +166,7 @@
             <input type="checkbox" id="addTimestampCheckbox" checked>
             <span>最終更新時間を表示する</span>
         </label>
-        <label style="display:flex;align-items:center;gap:8px;margin:8px 0;font-size:0.9em;color:var(--check-bg);cursor:pointer;user-select:none;">
-            <input type="checkbox" id="hideDuplicateTimeCheckbox" checked>
-            <span>同じ時間の配信は時刻を非表示</span>
-        </label>
+        <!-- 「同じ時間の配信は時刻を非表示」のチェックボックスは完全に削除しました -->
         <button onclick="generateLinkSummary()" style="width:100%;padding:10px;background:#4CAF50;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:bold;">
             配信リンクまとめを作成
         </button>
@@ -179,14 +175,11 @@
             コピーする
         </button>
     </div>
-
     <div id="toast-container"></div>
-
     <div class="container">
         <h1 style="margin:0;padding:0;text-align:center;">
             <img src="https://drive.google.com/thumbnail?id=1L0g9BOCy2OkCuPPqZP1LoqeXQKP-OhRJ&sz=w1200" alt="hololist" class="logo-img">
         </h1>
-
         <div class="controls">
             <button onclick="loadSchedule()">更新</button>
             <button onclick="toggleTheme()" id="themeBtn">ダークモード</button>
@@ -194,9 +187,7 @@
             <input type="text" id="searchInput" class="search-bar" placeholder="タイトル・メンバー名で検索...">
             <span class="auto-refresh">自動更新: <span id="timer">5:00</span></span>
         </div>
-
         <div class="summary" id="summary">今日の配信: <strong id="todayCount">0</strong>本（LIVE: <span id="liveCount">0</span> | 予定: <span id="upcomingCount">0</span>）</div>
-
         <div class="filter-controls">
             <label class="filter-checkbox active" data-mode="all">
                 <input type="checkbox" checked>
@@ -225,10 +216,8 @@
             </label>
             <button class="clear-all-btn" onclick="clearAllChecks()">全チェック解除</button>
         </div>
-
         <div id="content">読み込み中...</div>
     </div>
-
     <script>
         const API_KEY = 'ffae7804-5730-4ec9-9931-1d31cc52b9d2';
         const CHECKED_STORAGE = 'hololive_checked_videos';
@@ -344,23 +333,20 @@
         async function generateLinkSummary() {
             const checked = document.querySelectorAll('.checkbox-overlay.checked');
             if (checked.length === 0) { alert('チェックがありません。'); return; }
-
             const lastTitle = localStorage.getItem(SUMMARY_TITLE_STORAGE) || '今日の同時視聴まとめ';
             const lastView = localStorage.getItem(SUMMARY_VIEW_STORAGE) || '配信';
-
             const titleInput = prompt('タイトルを入力（空欄OK）', lastTitle);
             if (titleInput === null) return;
             const title = titleInput.trim();
-
             const viewText = prompt('例：視点 / 配信 / 枠 / 部屋 (空欄OK)', lastView);
             if (viewText === null) return;
             const view = viewText.trim() ? ' ' + viewText.trim() : '';
-
             localStorage.setItem(SUMMARY_TITLE_STORAGE, title);
             localStorage.setItem(SUMMARY_VIEW_STORAGE, viewText.trim());
 
             const addTimestamp = document.getElementById('addTimestampCheckbox').checked;
-            const hideDuplicateTime = document.getElementById('hideDuplicateTimeCheckbox').checked;
+            // hideDuplicateTime 関連は完全に削除
+
             const groups = {};
             checked.forEach(el => {
                 const card = el.closest('.stream-card');
@@ -385,11 +371,9 @@
             if (title || addTimestamp) output += '\n';
 
             const timeKeys = Object.keys(groups).sort();
-            timeKeys.forEach((time, index) => {
+            timeKeys.forEach(time => {
                 const items = groups[time];
-                if (!hideDuplicateTime || index === 0 || time.split(' ')[1] !== timeKeys[index-1]?.split(' ')[1]) {
-                    output += `■${time} ~\n`;
-                }
+                output += `■${time} ~\n`;  // 常に時刻を表示
                 items.forEach(item => {
                     output += `${item.member}${view}\n${item.url}\n\n`;
                 });
