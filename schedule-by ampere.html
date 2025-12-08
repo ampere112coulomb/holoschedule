@@ -20,7 +20,7 @@
             --check-bg: #4CAF50;
             --check-border: #43A047;
             --all-check-bg: #4FC3F7;
-            --clock-bg: rgba(255, 255, 255, 0.95);
+            --clock-bg: rgba(255,255,255,0.95);
             --clock-text: #0288D1;
             --favorite-bg: #FFD700;
             --favorite-border: #FFA000;
@@ -59,66 +59,84 @@
         .search-bar {padding:8px 12px;border:1px solid #ccc;border-radius:4px;width:250px;font-size:1em;}
         [data-theme="dark"] .search-bar {background:#333;color:#EEE;border-color:#555;}
         .summary {text-align:center;font-size:1.1em;margin:10px 0;color:var(--header-bg);}
-        .filter-controls {display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:20px;}
-        .filter-checkbox {display:flex;align-items:center;padding:8px 16px;background:#E0E0E0;color:#333;border-radius:4px;cursor:pointer;user-select:none;font-weight:bold;position:relative;transition:background .2s;}
+        .filter-controls {display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-bottom:20px;}
+        .filter-checkbox {display:flex;align-items:center;padding:9px 18px;background:#E0E0E0;color:#333;border-radius:30px;cursor:pointer;user-select:none;font-weight:bold;transition:all .2s;}
         [data-theme="dark"] .filter-checkbox {background:#333;color:#EEE;}
-        .filter-checkbox:hover {background:#D0D0D0;}
+        .filter-checkbox:hover {background:#d0d0d0;}
         [data-theme="dark"] .filter-checkbox:hover {background:#444;}
         .filter-checkbox input {position:absolute;opacity:0;cursor:pointer;height:0;width:0;}
-        .filter-checkbox .checkmark {width:24px;height:24px;background:rgba(255,255,255,0.3);border:2px solid rgba(255,255,255,0.6);border-radius:50%;margin-right:8px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,0.3);transition:all .2s;font-size:14px;color:transparent;}
-        .filter-checkbox input:checked ~ .checkmark {background:var(--check-bg);border-color:var(--check-bg);color:white;}
-        .filter-checkbox input:checked ~ .checkmark::after {content:'✓';font-weight:bold;}
-        .filter-checkbox[data-mode="all"] input:checked ~ .checkmark {background:var(--all-check-bg);border-color:var(--all-check-bg);}
-        .filter-checkbox[data-mode="announce"] .checkmark {border-color:var(--announce);}
-        .filter-checkbox[data-mode="announce"] input:checked ~ .checkmark {background:var(--announce);border-color:var(--announce);}
-        .filter-checkbox[data-mode="memorial"] .checkmark {border-color:var(--memorial);}
-        .filter-checkbox[data-mode="memorial"] input:checked ~ .checkmark {background:var(--memorial);border-color:var(--memorial);color:white;}
-        .filter-checkbox[data-mode="checked"] .checkmark {border-color:var(--check-border);}
-        .filter-checkbox[data-mode="checked"] input:checked ~ .checkmark {background:var(--check-bg);border-color:var(--check-border);color:white;}
-        #favoriteFilterBtn .checkmark {border-color:var(--favorite-border);}
-        #favoriteFilterBtn input:checked ~ .checkmark {background:var(--favorite-bg);border-color:var(--favorite-bg);color:white;}
-        #favoriteFilterBtn input:checked ~ .checkmark::after {content:'★';font-weight:bold;}
-        .filter-checkbox.active {background:var(--header-bg);color:white;}
-        [data-theme="dark"] .filter-checkbox.active {background:var(--header-bg);}
-        .clear-all-btn {background:#E0E0E0;color:#333;}
-        [data-theme="dark"] .clear-all-btn {background:#333;color:#EEE;}
-        .clear-all-btn:hover {background:#D0D0D0;}
-        [data-theme="dark"] .clear-all-btn:hover {background:#444;}
-        .time-group {margin-bottom:20px;position:relative;}
-        .time-header {font-size:1.2em;font-weight:bold;color:#FFF;background:var(--header-bg);padding:10px;border-radius:4px;display:flex;align-items:center;justify-content:space-between;}
-        .time-header span {flex:1;}
-        .header-checkbox {width:24px;height:24px;border-radius:50%;cursor:pointer;background:rgba(255,255,255,0.3);border:2px solid rgba(255,255,255,0.6);box-shadow:0 1px 3px rgba(0,0,0,0.3);transition:all .2s;margin-left:10px;flex-shrink:0;}
-        .header-checkbox.checked {background:var(--check-bg);border-color:var(--check-bg);}
-        .schedule-container {overflow-x:auto;white-space:nowrap;padding-bottom:10px;}
-        .stream-card {display:inline-block;width:280px;margin-right:15px;background:var(--card-bg);border-radius:8px;overflow:hidden;box-shadow:0 2px 5px var(--shadow);position:relative;border:2px solid transparent;transition:transform .2s;}
-        .stream-card.favorite {border-color:var(--favorite-card-border)!important;}
-        .stream-card:hover {transform:translateY(-3px);}
-        .thumbnail {width:100%;aspect-ratio:16/9;object-fit:cover;}
-        .stream-info {padding:10px;position:relative;}
-        .member-name {font-size:1.1em;font-weight:bold;color:var(--header-bg);}
-        .stream-title {font-size:0.9em;color:#555;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-        [data-theme="dark"] .stream-title {color:#CCC;}
-        .status-indicator {
-            position:absolute;bottom:10px;right:10px;padding:6px 12px;border-radius:6px;color:white;
-            font-size:0.85em;font-weight:bold;
+        .filter-checkbox .checkmark {
+            width:26px;height:26px;border-radius:50%;margin-right:10px;
+            background:rgba(255,255,255,0.3);
+            border:2px solid rgba(255,255,255,0.6);
+            transition:all .25s;
+            box-shadow:0 1px 3px rgba(0,0,0,0.3);
         }
+        .filter-checkbox input:checked ~ .checkmark {
+            background:var(--check-bg);
+            border-color:var(--check-border);
+            transform:scale(1.15);
+        }
+        .filter-checkbox[data-mode="all"] input:checked ~ .checkmark {
+            background:var(--all-check-bg);
+            border-color:var(--all-check-bg);
+        }
+        #favoriteFilterBtn input:checked ~ .checkmark {
+            background:var(--favorite-bg);
+            border-color:var(--favorite-border);
+            transform:scale(1.15);
+        }
+        .filter-checkbox.active {background:var(--header-bg);color:white;}
+        .clear-all-btn {background:#f44336;color:white;padding:9px 20px;border:none;border-radius:30px;cursor:pointer;font-weight:bold;}
+        .time-group {margin-bottom:25px;}
+        .time-header {font-size:1.3em;font-weight:bold;color:#FFF;background:var(--header-bg);padding:12px 16px;border-radius:8px;display:flex;align-items:center;justify-content:space-between;}
+        .header-checkbox {
+            width:28px;height:28px;border-radius:50%;
+            background:rgba(255,255,255,0.3);
+            border:2px solid rgba(255,255,255,0.6);
+            transition:all .25s;
+        }
+        .header-checkbox.checked {background:var(--check-bg);border-color:var(--check-border);transform:scale(1.15);}
+        .schedule-container {overflow-x:auto;white-space:nowrap;padding-bottom:10px;}
+        .stream-card {display:inline-block;width:280px;margin:8px 8px 8px 0;vertical-align:top;background:var(--card-bg);border-radius:10px;overflow:hidden;box-shadow:0 4px 12px var(--shadow);position:relative;border:3px solid transparent;transition:transform .2s;}
+        .stream-card.favorite {border-color:var(--favorite-card-border)!important;}
+        .stream-card:hover {transform:translateY(-5px);}
+        .thumbnail {width:100%;aspect-ratio:16/9;object-fit:cover;}
+        .stream-info {padding:12px;}
+        .member-name {font-weight:bold;color:var(--header-bg);font-size:1.1em;margin-bottom:4px;}
+        .stream-title {font-size:0.93em;line-height:1.4;color:#555;margin-top:4px;height:2.8em;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+        [data-theme="dark"] .stream-title {color:#CCC;}
+        .status-indicator {position:absolute;bottom:12px;right:12px;padding:6px 14px;border-radius:6px;color:white;font-weight:bold;font-size:0.9em;}
         .live {background:var(--live);}
         .upcoming {background:var(--upcoming);}
         .announce {background:var(--announce);}
         .memorial {background:var(--memorial);}
-        .announce-memorial {
-            background: linear-gradient(to right, var(--announce) 50%, var(--memorial) 50%);
+        .announce-memorial {background:linear-gradient(90deg,var(--announce) 50%,var(--memorial) 50%);}
+        .checkbox-overlay,.favorite-overlay {
+            position:absolute;width:36px;height:36px;border-radius:50%;cursor:pointer;z-index:10;
+            box-shadow:0 2px 8px rgba(0,0,0,0.3);transition:all .25s;
         }
-        .checkbox-overlay,.favorite-overlay {position:absolute;width:32px;height:32px;border-radius:50%;cursor:pointer;z-index:10;box-shadow:0 1px 3px rgba(0,0,0,0.3);transition:all .2s;display:flex;align-items:center;justify-content:center;font-size:18px;}
-        .checkbox-overlay {top:8px;right:8px;background:rgba(255,255,255,0.3);border:2px solid rgba(255,255,255,0.6);}
-        .checkbox-overlay.checked {background:var(--check-bg);border-color:var(--check-border);}
-        .favorite-overlay {top:8px;left:8px;background:rgba(255,255,255,0.4);border:2px solid var(--favorite-border);}
-        .favorite-overlay::before {content:'★';color:transparent;}
-        .favorite-overlay.favorited {background:var(--favorite-bg);border-color:var(--favorite-bg);}
-        .favorite-overlay.favorited::before {color:white;}
-        .stream-card[style*="display: none"] .checkbox-overlay,
-        .stream-card.force-hidden-check .checkbox-overlay {display:none!important;}
-        #checkedPanel {position:fixed;top:70px;right:20px;width:340px;background:var(--clock-bg);border:2px solid var(--check-bg);border-radius:10px;padding:15px;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,0.2);font-size:0.9em;display:none;}
+        .checkbox-overlay {
+            top:8px;right:8px;
+            background:rgba(255,255,255,0.3);
+            border:3px solid rgba(255,255,255,0.7);
+        }
+        .checkbox-overlay.checked {
+            background:var(--check-bg);
+            border-color:var(--check-border);
+            transform:scale(1.15);
+        }
+        .favorite-overlay {
+            top:8px;left:8px;
+            background:rgba(255,255,255,0.3);
+            border:3px solid var(--favorite-border);
+        }
+        .favorite-overlay.favorited {
+            background:var(--favorite-bg);
+            border-color:var(--favorite-border);
+            transform:scale(1.15);
+        }
+        #checkedPanel {position:fixed;top:70px;right:20px;width:340px;background:var(--clock-bg);border:2px solid var(--check-bg);border-radius:12px;padding:15px;z-index:999;box-shadow:0 8px 30px rgba(0,0,0,0.3);display:none;}
         #checkedPanel .header {display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-weight:bold;color:var(--check-bg);}
         #checkedList {max-height:220px;overflow-y:auto;margin-bottom:10px;}
         #checkedList > div {margin:6px 0;padding:8px;background:rgba(76,175,80,0.1);border-radius:6px;cursor:pointer;}
@@ -128,7 +146,7 @@
         .notification-toast {min-width:320px;max-width:400px;background:#1E1E1E;color:#FFF;border-radius:8px;box-shadow:0 8px 25px rgba(0,0,0,0.4);padding:16px;font-family:'Segoe UI','Noto Sans JP',sans-serif;border-left:4px solid #00B7EB;opacity:0;transform:translateY(20px);transition:all .4s cubic-bezier(0.25,0.8,0.25,1);}
         .notification-toast.show {opacity:1;transform:translateY(0);}
         .notification-toast.live {border-left-color:#E53935;}
-        .notification-toast .close-btn {position:absolute;top:8px;right:12px;background:none;border:none;color:#AAA;font-size:20px;cursor:pointer;padding:0;width:24px;height:24px;line-height:24px;}
+        .notification-toast .close-btn {position:absolute;top:8px;right:12px;background:none;border:none;color:#AAA;font-size:20px;cursor:pointer;}
         .notification-toast .close-btn:hover {color:#FFF;}
         .notification-toast .title {font-weight:600;font-size:15px;margin-bottom:6px;}
         .notification-toast .body {font-size:14px;line-height:1.4;color:#DDD;}
@@ -138,12 +156,21 @@
 </head>
 <body>
     <div class="clock" id="jstClock">JST: 00:00:00</div>
+
     <div id="checkedPanel">
         <div class="header">
             <span>チェック済み配信 (<span id="checkedCount">0</span>)</span>
             <button onclick="document.getElementById('checkedPanel').style.display='none'" style="background:none;border:none;font-size:20px;cursor:pointer;color:#AAA;">x</button>
         </div>
         <div id="checkedList"></div>
+        <label style="display:flex;align-items:center;gap:8px;margin:8px 0;font-size:0.9em;color:var(--check-bg);cursor:pointer;user-select:none;">
+            <input type="checkbox" id="addTimestampCheckbox" checked>
+            <span>最終更新時間を表示する</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;margin:8px 0;font-size:0.9em;color:var(--check-bg);cursor:pointer;user-select:none;">
+            <input type="checkbox" id="hideDuplicateTimeCheckbox" checked>
+            <span>同じ時間の配信は時刻を非表示</span>
+        </label>
         <button onclick="generateLinkSummary()" style="width:100%;padding:10px;background:#4CAF50;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:bold;">
             配信リンクまとめを作成
         </button>
@@ -152,11 +179,14 @@
             コピーする
         </button>
     </div>
+
     <div id="toast-container"></div>
+
     <div class="container">
         <h1 style="margin:0;padding:0;text-align:center;">
             <img src="https://drive.google.com/thumbnail?id=1L0g9BOCy2OkCuPPqZP1LoqeXQKP-OhRJ&sz=w1200" alt="hololist" class="logo-img">
         </h1>
+
         <div class="controls">
             <button onclick="loadSchedule()">更新</button>
             <button onclick="toggleTheme()" id="themeBtn">ダークモード</button>
@@ -164,7 +194,9 @@
             <input type="text" id="searchInput" class="search-bar" placeholder="タイトル・メンバー名で検索...">
             <span class="auto-refresh">自動更新: <span id="timer">5:00</span></span>
         </div>
+
         <div class="summary" id="summary">今日の配信: <strong id="todayCount">0</strong>本（LIVE: <span id="liveCount">0</span> | 予定: <span id="upcomingCount">0</span>）</div>
+
         <div class="filter-controls">
             <label class="filter-checkbox active" data-mode="all">
                 <input type="checkbox" checked>
@@ -193,6 +225,7 @@
             </label>
             <button class="clear-all-btn" onclick="clearAllChecks()">全チェック解除</button>
         </div>
+
         <div id="content">読み込み中...</div>
     </div>
 
@@ -200,12 +233,14 @@
         const API_KEY = 'ffae7804-5730-4ec9-9931-1d31cc52b9d2';
         const CHECKED_STORAGE = 'hololive_checked_videos';
         const FAVORITE_CHANNELS_STORAGE = 'hololive_favorite_channels';
+        const SUMMARY_TITLE_STORAGE = 'hololist_summary_title';
+        const SUMMARY_VIEW_STORAGE = 'hololist_summary_view';
         let checkedVideos = new Set(JSON.parse(localStorage.getItem(CHECKED_STORAGE) || '[]'));
         let favoriteChannels = new Set(JSON.parse(localStorage.getItem(FAVORITE_CHANNELS_STORAGE) || '[]'));
         let countdown = 300;
         let autoRefreshTimer;
-        const ANNOUNCE_KEYWORDS = ['告知', 'お披露目', '発表', '新衣装', '重大', 'おひろめ'];
-        const MEMORIAL_KEYWORDS = ['周年', '生誕', '爆誕'];
+        const ANNOUNCE_KEYWORDS = ['告知','お披露目','発表','新衣装','重大','おひろめ'];
+        const MEMORIAL_KEYWORDS = ['周年','生誕','爆誕'];
         let notifyEnabled = localStorage.getItem('notifyEnabled') !== 'false';
         const toastContainer = document.getElementById('toast-container');
 
@@ -217,7 +252,8 @@
             const s = String(jst.getSeconds()).padStart(2, '0');
             document.getElementById('jstClock').textContent = `JST: ${h}:${m}:${s}`;
         }
-        updateJSTClock(); setInterval(updateJSTClock, 1000);
+        updateJSTClock();
+        setInterval(updateJSTClock, 1000);
 
         function toggleTheme() {
             const isDark = document.body.getAttribute('data-theme') === 'dark';
@@ -281,11 +317,6 @@
                 const allChecked = checkedCount === visibleCards.length;
                 const someChecked = checkedCount > 0 && !allChecked;
                 headerCheck.classList.toggle('checked', allChecked || someChecked);
-                if (someChecked) {
-                    headerCheck.style.background = 'linear-gradient(to right, var(--check-bg) 50%, rgba(255,255,255,0.3)  50%)';
-                } else {
-                    headerCheck.style.background = allChecked ? 'var(--check-bg)' : 'rgba(255,255,255,0.3)';
-                }
             });
         }
 
@@ -313,11 +344,23 @@
         async function generateLinkSummary() {
             const checked = document.querySelectorAll('.checkbox-overlay.checked');
             if (checked.length === 0) { alert('チェックがありません。'); return; }
-            const title = prompt('タイトルを入力（空欄OK）', '');
-            if (title === null) return;
-            const viewText = prompt('例：視点 / 配信 / 枠 / 部屋 (空欄OK)', '');
+
+            const lastTitle = localStorage.getItem(SUMMARY_TITLE_STORAGE) || '今日の同時視聴まとめ';
+            const lastView = localStorage.getItem(SUMMARY_VIEW_STORAGE) || '配信';
+
+            const titleInput = prompt('タイトルを入力（空欄OK）', lastTitle);
+            if (titleInput === null) return;
+            const title = titleInput.trim();
+
+            const viewText = prompt('例：視点 / 配信 / 枠 / 部屋 (空欄OK)', lastView);
             if (viewText === null) return;
-            const view = viewText.trim() || '';
+            const view = viewText.trim() ? ' ' + viewText.trim() : '';
+
+            localStorage.setItem(SUMMARY_TITLE_STORAGE, title);
+            localStorage.setItem(SUMMARY_VIEW_STORAGE, viewText.trim());
+
+            const addTimestamp = document.getElementById('addTimestampCheckbox').checked;
+            const hideDuplicateTime = document.getElementById('hideDuplicateTimeCheckbox').checked;
             const groups = {};
             checked.forEach(el => {
                 const card = el.closest('.stream-card');
@@ -326,16 +369,33 @@
                 const url = `https://youtu.be/${videoId}`;
                 const member = card.querySelector('.member-name').textContent;
                 const date = new Date(parseInt(card.dataset.startTime));
-                const key = date.toLocaleDateString('ja-JP', {month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}).replace(/\/(\d)\//g, '/0$1/');
+                const key = date.toLocaleDateString('ja-JP', {month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})
+                             .replace(/\/(\d)\//g, '/0$1/');
                 if (!groups[key]) groups[key] = [];
                 groups[key].push({member, url});
             });
-            let output = title ? `【${title}】\n\n` : '';
-            Object.keys(groups).sort().forEach(time => {
-                groups[time].forEach(item => {
-                    output += `■${time} ~ ${item.member}${view}\n${item.url}\n\n`;
+
+            const now = new Date();
+            const jst = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Tokyo"}));
+            const timestamp = jst.toLocaleDateString('ja-JP', {year:'numeric', month:'2-digit', day:'2-digit'})
+                              .replace(/\//g, '/') + ' ' + jst.toTimeString().slice(0,5);
+
+            let output = title ? `【${title}】\n` : '';
+            if (addTimestamp) output += `（最終更新 : ${timestamp}）\n`;
+            if (title || addTimestamp) output += '\n';
+
+            const timeKeys = Object.keys(groups).sort();
+            timeKeys.forEach((time, index) => {
+                const items = groups[time];
+                if (!hideDuplicateTime || index === 0 || time.split(' ')[1] !== timeKeys[index-1]?.split(' ')[1]) {
+                    output += `■${time} ~\n`;
+                }
+                items.forEach(item => {
+                    output += `${item.member}${view}\n${item.url}\n\n`;
                 });
+                output += '\n';
             });
+
             const outputEl = document.getElementById('linkOutput');
             const copyBtn = document.getElementById('copyBtn');
             outputEl.textContent = output.trim();
@@ -346,12 +406,12 @@
         function copyToClipboard() {
             const text = document.getElementById('linkOutput').textContent;
             const btn = document.getElementById('copyBtn');
-            const originalText = btn.textContent;
+            const original = btn.textContent;
             navigator.clipboard.writeText(text).then(() => {
                 btn.textContent = 'コピー完了！';
                 btn.style.background = '#4CAF50';
                 setTimeout(() => {
-                    btn.textContent = originalText;
+                    btn.textContent = original;
                     btn.style.background = '#2196F3';
                 }, 1500);
             });
@@ -395,6 +455,7 @@
             const memorialInput = document.querySelector('.filter-checkbox[data-mode="memorial"] input');
             const checkedInput = document.querySelector('.filter-checkbox[data-mode="checked"] input');
             const favoriteInput = document.getElementById('favoriteFilterBtn').querySelector('input');
+
             const filterAll = allInput.checked;
             const filterAnnounce = announceInput.checked;
             const filterMemorial = memorialInput.checked;
@@ -402,6 +463,7 @@
             const filterFavorite = favoriteInput.checked;
 
             document.getElementById('favoriteFilterBtn').querySelector('span:not(.checkmark)').textContent = `推しのみ ${filterFavorite ? 'ON' : 'OFF'}`;
+
             document.querySelectorAll('.filter-checkbox').forEach(label => {
                 label.classList.toggle('active', label.querySelector('input').checked);
             });
@@ -419,14 +481,15 @@
                     const isChecked = checkedVideos.has(videoId);
                     const isFavorite = favoriteChannels.has(channelId);
                     const matchesSearch = !searchText || title.includes(searchText) || member.includes(searchText);
+
                     let show = matchesSearch;
                     if (!filterAll) {
-                        show = matchesSearch;
                         if (filterAnnounce && !isAnnounce) show = false;
                         if (filterMemorial && !isMemorial) show = false;
                         if (filterChecked && !isChecked) show = false;
                     }
                     if (filterFavorite && !isFavorite) show = false;
+
                     card.style.display = show ? 'inline-block' : 'none';
                     if (show) {
                         card.classList.remove('force-hidden-check');
@@ -437,6 +500,7 @@
                 });
                 group.style.display = visibleCount > 0 ? 'block' : 'none';
             });
+
             updateSummary();
             updateHeaderCheckboxes();
         }
@@ -463,6 +527,7 @@
                 if (!res.ok) throw new Error(res.status === 429 ? 'リクエスト多すぎ（しばらく待ってね）' : '読み込み失敗');
                 const videos = await res.json();
                 if (!Array.isArray(videos)) throw new Error('データ形式エラー');
+
                 const groups = {};
                 videos.forEach(v => {
                     const d = new Date(v.available_at);
@@ -470,6 +535,7 @@
                     if (!groups[key]) groups[key] = [];
                     groups[key].push(v);
                 });
+
                 let html = '';
                 Object.keys(groups).sort().forEach(k => {
                     html += `
@@ -487,26 +553,14 @@
                         const startMs = new Date(v.available_at).getTime();
                         const thumb = `https://img.youtube.com/vi/${v.id}/hqdefault.jpg`;
                         const timeStr = new Date(v.available_at).toLocaleString('ja-JP', {hour:'2-digit', minute:'2-digit'});
-
                         const isAnn = ANNOUNCE_KEYWORDS.some(kw => v.title.includes(kw));
                         const isMem = MEMORIAL_KEYWORDS.some(kw => v.title.includes(kw));
-
                         let stClass = 'upcoming';
                         let stText = timeStr;
-
-                        if (v.status === 'live') {
-                            stClass = 'live';
-                            stText = 'LIVE';
-                        } else if (isAnn && isMem) {
-                            stClass = 'announce-memorial';
-                            stText = timeStr;  // ← 時間表示
-                        } else if (isAnn) {
-                            stClass = 'announce';
-                            stText = '告知';
-                        } else if (isMem) {
-                            stClass = 'memorial';
-                            stText = '記念';
-                        }
+                        if (v.status === 'live') { stClass = 'live'; stText = 'LIVE'; }
+                        else if (isAnn && isMem) { stClass = 'announce-memorial'; }
+                        else if (isAnn) { stClass = 'announce'; }
+                        else if (isMem) { stClass = 'memorial'; }
 
                         html += `
                         <div class="stream-card ${fav?'favorite':''}" data-video-id="${v.id}" data-channel-id="${cid}" data-start-time="${startMs}">
@@ -526,6 +580,7 @@
                     });
                     html += `</div></div>`;
                 });
+
                 content.innerHTML = html || '<p style="text-align:center;color:#666;">今日の配信予定はありません</p>';
                 applyFilter();
                 updateSummary();
@@ -599,17 +654,17 @@
             });
         }
 
-        const notifyBtn20 = document.createElement('button');
-        notifyBtn20.id = 'notifyBtn';
-        notifyBtn20.textContent = `通知: ${notifyEnabled?'ON':'OFF'}`;
-        notifyBtn20.style.cssText = 'background:'+(notifyEnabled?'#FF9800':'#666')+';margin-left:10px;padding:8px 14px;border-radius:6px;color:white;border:none;cursor:pointer;';
-        notifyBtn20.onclick = () => {
+        const notifyBtn = document.createElement('button');
+        notifyBtn.id = 'notifyBtn';
+        notifyBtn.textContent = `通知: ${notifyEnabled?'ON':'OFF'}`;
+        notifyBtn.style.cssText = 'background:'+(notifyEnabled?'#FF9800':'#666')+';margin-left:10px;padding:8px 14px;border-radius:6px;color:white;border:none;cursor:pointer;';
+        notifyBtn.onclick = () => {
             notifyEnabled = !notifyEnabled;
-            notifyBtn20.textContent = `通知: ${notifyEnabled?'ON':'OFF'}`;
-            notifyBtn20.style.background = notifyEnabled ? '#FF9800' : '#666';
+            notifyBtn.textContent = `通知: ${notifyEnabled?'ON':'OFF'}`;
+            notifyBtn.style.background = notifyEnabled ? '#FF9800' : '#666';
             localStorage.setItem('notifyEnabled', notifyEnabled);
         };
-        document.querySelector('.controls').appendChild(notifyBtn20);
+        document.querySelector('.controls').appendChild(notifyBtn);
 
         setInterval(checkNotifications, 10000);
 
