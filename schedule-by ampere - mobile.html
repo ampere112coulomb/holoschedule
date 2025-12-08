@@ -102,7 +102,6 @@
         .favorite-overlay {position:absolute;top:10px;left:10px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.5);border:2px solid var(--favorite-border);cursor:pointer;z-index:10;box-shadow:0 2px 6px rgba(0,0,0,0.3);transition:all .2s;}
         .favorite-overlay.favorited {background:var(--favorite-bg);border-color:var(--favorite-bg);}
         .error-message {text-align:center;color:var(--error);padding:20px;background:rgba(255,0,0,0.1);border-radius:10px;margin:20px 0;}
-
         #checkedBottomBar {
             position:fixed;bottom:20px;right:16px;background:var(--check-bg);color:white;padding:14px 20px;border-radius:14px;
             font-weight:bold;font-size:15px;box-shadow:0 4px 18px rgba(0,0,0,0.35);z-index:998;cursor:pointer;
@@ -122,10 +121,12 @@
 <body>
     <div class="clock" id="jstClock">JST: 00:00:00</div>
 
+    <!-- チェック済みバー（下部） -->
     <div id="checkedBottomBar" onclick="toggleCheckedPanel()" style="display:none;">
         チェック済みの配信 [<span id="checkedCountBtn">0</span>]
     </div>
 
+    <!-- チェック済みパネル（下からスライドアップ） -->
     <div id="checkedPanelNew">
         <div class="panel-header">
             <span>チェック済み配信 (<span id="checkedCount">0</span>件)</span>
@@ -133,13 +134,10 @@
         </div>
         <div id="checkedList"></div>
 
+        <!-- 時刻非表示チェックボックスは完全に削除しました -->
         <label style="display:flex;align-items:center;gap:8px;margin:12px 0;font-size:0.95em;color:var(--check-bg);">
             <input type="checkbox" id="addTimestampCheckbox" checked>
             <span>最終更新時間を表示</span>
-        </label>
-        <label style="display:flex;align-items:center;gap:8px;margin:8px 0;font-size:0.95em;color:var(--check-bg);">
-            <input type="checkbox" id="hideDuplicateTimeCheckbox" checked>
-            <span>同じ時間の配信は時刻非表示</span>
         </label>
 
         <button onclick="generateLinkSummary()" style="width:100%;padding:13px;background:#4CAF50;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;margin-top:14px;font-size:15px;">
@@ -196,6 +194,7 @@
         const FAVORITE_CHANNELS_STORAGE = 'hololive_favorite_channels';
         const SUMMARY_TITLE_STORAGE = 'hololist_summary_title';
         const SUMMARY_VIEW_STORAGE = 'hololist_summary_view';
+
         let checkedVideos = new Set(JSON.parse(localStorage.getItem(CHECKED_STORAGE) || '[]'));
         let favoriteChannels = new Set(JSON.parse(localStorage.getItem(FAVORITE_CHANNELS_STORAGE) || '[]'));
         let countdown = 300;
@@ -249,6 +248,7 @@
             document.getElementById('checkedCount').textContent = count;
             document.getElementById('checkedCountBtn').textContent = count;
             document.getElementById('checkedBottomBar').style.display = count > 0 ? 'flex' : 'none';
+
             if (count === 0) {
                 document.getElementById('checkedPanelNew').classList.remove('open');
                 document.getElementById('linkOutput').style.display = 'none';
@@ -256,6 +256,7 @@
                 document.getElementById('checkedList').innerHTML = '';
                 return;
             }
+
             let html = '';
             checked.forEach(el => {
                 const card = el.closest('.stream-card');
@@ -311,30 +312,26 @@
             applyFilter();
         }
 
-        // 配信リンクまとめ（前回の入力内容を記憶してデフォルトに）
+        // 配信リンクまとめ作成（時刻非表示機能は完全に削除）
         async function generateLinkSummary() {
             const checked = document.querySelectorAll('.checkbox-overlay.checked');
             if (checked.length === 0) {
                 alert('チェックがありません。');
                 return;
             }
-
             const lastTitle = localStorage.getItem(SUMMARY_TITLE_STORAGE) || '今日の同時視聴まとめ';
             const lastView = localStorage.getItem(SUMMARY_VIEW_STORAGE) || '配信';
-
             const titleInput = prompt('タイトルを入力（空欄OK）', lastTitle);
             if (titleInput === null) return;
             const title = titleInput.trim();
-
             const viewText = prompt('例：視点 / 配信 / 枠 / 部屋（空欄OK）', lastView);
             if (viewText === null) return;
             const view = viewText.trim() ? ' ' + viewText.trim() : '';
-
             localStorage.setItem(SUMMARY_TITLE_STORAGE, title);
             localStorage.setItem(SUMMARY_VIEW_STORAGE, viewText.trim());
 
             const addTimestamp = document.getElementById('addTimestampCheckbox').checked;
-            const hideDuplicateTime = document.getElementById('hideDuplicateTimeCheckbox').checked;
+            // hideDuplicateTime は削除
 
             const groups = {};
             checked.forEach(el => {
@@ -358,10 +355,8 @@
             if (title || addTimestamp) output += '\n';
 
             const timeKeys = Object.keys(groups).sort();
-            timeKeys.forEach((time, i) => {
-                if (!hideDuplicateTime || i === 0 || time.split(' ')[1] !== timeKeys[i-1]?.split(' ')[1]) {
-                    output += `■${time} ~\n`;
-                }
+            timeKeys.forEach(time => {
+                output += `■${time} ~\n`;  // 常に時刻を表示
                 groups[time].forEach(item => {
                     output += `${item.member}${view}\n${item.url}\n\n`;
                 });
